@@ -199,7 +199,7 @@ class EPGRecyclerView @JvmOverloads constructor(
     private fun ChannelModel.findShowStartAfterTime(time: DateTime): ShowModel? {
         return this.shows.find { show ->
             show.startDate == time
-                    || (show.realStartDate.isBefore(time) && show.realEndDate.isAfter(time))
+                    || (show.startDate.isBefore(time) && show.endDate.isAfter(time))
         }
     }
 
@@ -396,9 +396,9 @@ class EPGRecyclerView @JvmOverloads constructor(
     }
 
     private fun List<ShowModel>.getCurrentShow(): ShowModel? {
-        return this.find { it.realStartDate.isBeforeNow && it.realEndDate.isAfterNow }
+        return this.find { it.startDate.isBeforeNow && it.endDate.isAfterNow }
     }
 
     private val ShowModel.showDuration: Int
-        get() = Minutes.minutesBetween(realStartDate, realEndDate).minutes
+        get() = Minutes.minutesBetween(startDate, endDate).minutes
 }

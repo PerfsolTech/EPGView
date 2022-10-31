@@ -6,29 +6,44 @@
     android:layout_height="match_parent"
     android:background="@drawable/show_background"
     android:gravity="center_vertical"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:padding="5dp">
 
-    <TextView
-        android:id="@+id/tv_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:textColor="@color/white"
-        android:textSize="14sp"
-        tools:text="Das Erste HD" />
+    <ImageView
+        android:id="@+id/iv_show_image"
+        android:layout_width="100dp"
+        android:layout_height="match_parent"
+        tools:ignore="ContentDescription"
+        tools:src="@android:color/holo_green_dark" />
 
-    <TextView
-        android:id="@+id/tv_sub_title"
+    <LinearLayout
+        android:id="@+id/ll_show_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:includeFontPadding="false"
-        android:maxLines="1"
-        android:textColor="@color/white"
-        android:textSize="12sp"
-        tools:text="09:05 - 09:55" />
+        android:layout_marginStart="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            tools:text="Das Erste HD" />
+
+        <TextView
+            android:id="@+id/tv_sub_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            tools:text="09:05 - 09:55" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -1,9 +1,11 @@
 package com.volkov.epgrecycler.viewholders
 
 import android.view.View
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.volkov.EPGConfig
 import com.volkov.epg_recycler.databinding.ItemChannelBinding
 import com.volkov.epgrecycler.EPGRecyclerView
 import com.volkov.epgrecycler.EPGUtils
@@ -11,6 +13,7 @@ import com.volkov.epgrecycler.EPGUtils.startTime
 import com.volkov.epgrecycler.RecyclerWithPositionView
 import com.volkov.epgrecycler.adapters.ShowAdapter
 import com.volkov.epgrecycler.adapters.models.DataModel
+import com.volkov.epgrecycler.dpToPx
 import org.joda.time.DateTime
 
 class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -29,6 +32,12 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         eventListener: EPGRecyclerView.OnEventListener? = null,
     ) {
         binding.root.tag = "channel_${item.channelId}"
+
+        binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
+            height = EPGConfig.rowHeight.dpToPx
+            topMargin = EPGConfig.marginTop.dpToPx
+        }
+
         startDate = item.shows.firstOrNull()?.startDate ?: return
         endDate = DateTime(item.shows.last().endDate)
         horizontalRecyclerView.apply {
@@ -43,10 +52,9 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 channelId = item.channelId,
                 showId = show.id,
                 name = show.name,
+                showPreviewImage = show.showPreviewImage,
                 startDate = show.startDate,
                 endDate = show.endDate,
-                realStartDate = show.realStartDate,
-                realEndDate = show.realEndDate,
                 onShowSelect = {
                     eventListener?.onShowSelected(item.channelId, show.id)
                 },

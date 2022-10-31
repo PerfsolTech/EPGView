@@ -8,5 +8,5 @@
     <color name="epg_grey">#555555</color>
     <color name="epg_grey_light">#929192</color>
     <color name="epg_grey_dark">#181817</color>
-    <color name="red">#ff0002</color>
+    <color name="red">#ff0000</color>
 </resources>

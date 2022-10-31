@@ -1,11 +1,13 @@
 package com.volkov.epgrecycler
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.Rect
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
 val Number.dpToPx
     get() = TypedValue.applyDimension(
@@ -33,3 +35,6 @@ val View?.isViewOnScreen: Boolean
             return isGlobalVisible && Rect.intersects(actualPosition, screen)
         } ?: false
     }
+
+val ViewHolder.context: Context
+    get() = itemView.context

@@ -24,10 +24,9 @@ sealed class DataModel(val id: String) {
         val channelId: Int,
         val showId: String,
         val name: String,
+        val showPreviewImage: String?,
         val startDate: DateTime,
         val endDate: DateTime,
-        val realStartDate: DateTime = startDate,
-        val realEndDate: DateTime = endDate,
         val onShowSelect: () -> Unit,
         val onShowClick: () -> Unit,
     ) : DataModel("ShowDataModel_${showId}_${channelId}_${startDate}_${endDate}")
