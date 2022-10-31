@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="time_header_blue">#001f2c</color>
+    <color name="channel_logos_blue_dark">#091520</color>
+    <color name="colorAccent">#091520</color>
+    <color name="epg_grey">#555555</color>
+    <color name="epg_grey_light">#929192</color>
+    <color name="epg_grey_dark">#181817</color>
+    <color name="red">#ff0002</color>
+</resources>

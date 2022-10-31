@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tv_current_time"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:background="@color/time_header_blue"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:gravity="center"
+        android:textColor="@color/white"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Wed 12 Oct 13:42" />
+
+    <View
+        android:id="@+id/vertical_delimiter"
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="@color/epg_grey"
+        app:layout_constraintStart_toEndOf="@id/rv_channels_logos" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_channels_logos"
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        android:background="@color/channel_logos_blue_dark"
+        android:descendantFocusability="blocksDescendants"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_current_time" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_time_line"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:background="@color/time_header_blue"
+        android:descendantFocusability="blocksDescendants"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/vertical_delimiter"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:itemCount="4"
+        tools:listitem="@layout/item_time_line" />
+
+    <com.volkov.epgrecycler.RecyclerWithPositionView
+        android:id="@+id/rv_channels"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/rv_time_line"
+        app:layout_constraintTop_toBottomOf="@id/rv_time_line" />
+
+    <View
+        android:id="@+id/time_indicator"
+        android:layout_width="2dp"
+        android:layout_height="0dp"
+        android:background="@color/red"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@id/rv_time_line"
+        app:layout_constraintTop_toTopOf="@id/rv_time_line" />
+</androidx.constraintlayout.widget.ConstraintLayout>
