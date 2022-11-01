@@ -13,7 +13,7 @@
         android:layout_width="100dp"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:scaleType="center"
+        android:scaleType="fitXY"
         tools:ignore="ContentDescription"
         tools:src="@android:color/holo_green_dark" />
 

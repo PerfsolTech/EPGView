@@ -3,6 +3,11 @@ package com.volkov.epgrecyclerview
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.CenterInside
+import com.bumptech.glide.load.resource.bitmap.FitCenter
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.volkov.EPGConfig
 import com.volkov.epgrecycler.models.epg.ChannelModel
 import com.volkov.epgrecycler.models.epg.ShowModel
@@ -18,6 +23,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             displayFirstShowIcon = true
             marginTop = 10
             rowHeight = 90
+            transform = listOf(FitCenter(), GranularRoundedCorners(100f, 0f, 0f, 100f))
         }
         binding.epgView.apply {
             setDayShift(0)
@@ -35,14 +41,14 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                                 channelId = 1,
                                 name = "The Simpsons",
                                 startDate = startDate,
-                                endDate = startDate.plusMinutes(5),
+                                endDate = startDate.plusMinutes(50),
                                 showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
                             ),
                             ShowModel(
                                 id = "show_2",
                                 channelId = 1,
                                 name = "The Simpsons 2",
-                                startDate = startDate.plusMinutes(5),
+                                startDate = startDate.plusMinutes(50),
                                 endDate = startDate.plusMinutes(140),
                                 showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
                             )

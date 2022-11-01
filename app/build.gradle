@@ -43,6 +43,7 @@ dependencies {
     implementation "androidx.fragment:fragment-ktx:1.5.4"
 
     implementation "joda-time:joda-time:2.10.14"
+    implementation "com.github.bumptech.glide:glide:4.13.2"
 
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "androidx.appcompat:appcompat:1.5.1"
