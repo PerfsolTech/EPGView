@@ -31,7 +31,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         binding.root.background =
             ContextCompat.getDrawable(context, EPGConfig.showBackgroundDrawable)
 
-        binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon
+        binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon && item.showIndex == 0
         binding.llShowName.updateLayoutParams<LinearLayout.LayoutParams> {
             marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
         }

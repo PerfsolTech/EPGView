@@ -21,6 +21,7 @@ sealed class DataModel(val id: String) {
     ) : DataModel("ChannelDataModel_$channelId")
 
     data class ShowDataModel(
+        val showIndex : Int,
         val channelId: Int,
         val showId: String,
         val name: String,

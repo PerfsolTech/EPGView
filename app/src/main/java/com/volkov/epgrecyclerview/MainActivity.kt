@@ -3,6 +3,7 @@ package com.volkov.epgrecyclerview
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.volkov.EPGConfig
 import com.volkov.epgrecycler.models.epg.ChannelModel
 import com.volkov.epgrecycler.models.epg.ShowModel
 import com.volkov.epgrecyclerview.databinding.ActivityMainBinding
@@ -13,25 +14,42 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        with(EPGConfig) {
+            displayFirstShowIcon = true
+            marginTop = 10
+            rowHeight = 90
+        }
         binding.epgView.apply {
+            setDayShift(0)
+            val startDate = DateTime()
+            setStartHour(startDate.hourOfDay - 1)
             initView(
                 listOf(
                     ChannelModel(
-                        id = 1, logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg", name = "Channel_1", shows = listOf(
+                        id = 1,
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
                             ShowModel(
                                 id = "show_1",
                                 channelId = 1,
                                 name = "The Simpsons",
-                                startDate = DateTime(),
-                                endDate = DateTime().plusMinutes(90),
+                                startDate = startDate,
+                                endDate = startDate.plusMinutes(5),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = 1,
+                                name = "The Simpsons 2",
+                                startDate = startDate.plusMinutes(5),
+                                endDate = startDate.plusMinutes(140),
                                 showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
                             )
                         )
                     )
                 )
             )
-            setStartHour(5)
-            setDayShift(0)
         }
     }
 }

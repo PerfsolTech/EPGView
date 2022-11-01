@@ -7,10 +7,10 @@ class DiffCallback : DiffUtil.ItemCallback<DataModel>() {
     override fun areItemsTheSame(
         oldItem: DataModel,
         newItem: DataModel
-    ) = false
+    ) = oldItem.id == newItem.id
 
     override fun areContentsTheSame(
         oldItem: DataModel,
         newItem: DataModel
-    ) = false
+    ) = oldItem == newItem
 }

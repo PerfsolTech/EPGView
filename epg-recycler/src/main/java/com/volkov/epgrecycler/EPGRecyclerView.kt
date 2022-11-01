@@ -38,7 +38,6 @@ import org.joda.time.DateTime
 import org.joda.time.Minutes
 import kotlin.math.max
 
-
 class EPGRecyclerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
@@ -185,8 +184,8 @@ class EPGRecyclerView @JvmOverloads constructor(
     }
 
     fun initView(channels: List<ChannelModel>) {
-        if (channels.isEmpty()) return
         setTimeHeader()
+        if (channels.isEmpty()) return
         this.channels = channels.map { it.copy(shows = it.shows.filterShows()) }
         initChannelRecycler()
         val mappedChannels = this.channels.mapChannels()
@@ -377,8 +376,12 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     private fun List<ShowModel>.filterShows(): List<ShowModel> {
         return this.filter {
-            it.startDate.isBefore(endTime) && it.endDate.isAfter(startTime)
+            it.startDate.isBefore(endTime) && it.endDate.isAfter(DateTime())
         }
+    }
+
+    private fun List<ShowModel>.extendFirstShowIfNeeded(): List<ShowModel> {
+        return emptyList()
     }
 
     private fun List<ChannelModel>.mapChannels(): List<DataModel.ChannelDataModel> {

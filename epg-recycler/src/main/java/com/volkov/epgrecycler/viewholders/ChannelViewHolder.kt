@@ -47,8 +47,9 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             setHasFixedSize(false)
             this.scrollListener = horizontalScrollListener
         }
-        val showDataModelList: MutableList<DataModel> = item.shows.map { show ->
+        val showDataModelList: MutableList<DataModel> = item.shows.mapIndexed { index, show ->
             DataModel.ShowDataModel(
+                showIndex = index,
                 channelId = item.channelId,
                 showId = show.id,
                 name = show.name,
