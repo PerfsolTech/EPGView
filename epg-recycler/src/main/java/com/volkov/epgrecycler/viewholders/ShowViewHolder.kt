@@ -9,6 +9,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
 import com.volkov.EPGConfig
 import com.volkov.epg_recycler.databinding.ItemShowBinding
 import com.volkov.epgrecycler.EPGUtils.SHOW_TIME_PATTERN
@@ -36,7 +37,11 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
         }
         if (EPGConfig.displayFirstShowIcon) {
-            Glide.with(binding.ivShowImage).load(item.showPreviewImage).into(binding.ivShowImage)
+            val corners = 10.dpToPx.toFloat()
+            Glide.with(binding.ivShowImage)
+                .load(item.showPreviewImage)
+                .transform(GranularRoundedCorners(corners, 0f, 0f, corners))
+                .into(binding.ivShowImage)
         }
 
         val realStartDate = DateTime(item.startDate)
