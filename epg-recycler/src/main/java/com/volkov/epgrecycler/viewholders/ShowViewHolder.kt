@@ -1,21 +1,17 @@
 package com.volkov.epgrecycler.viewholders
 
-import android.R.attr.radius
 import android.annotation.SuppressLint
-import android.graphics.drawable.Drawable
 import android.view.View
-import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.request.RequestOptions
-import com.bumptech.glide.request.target.Target
 import com.volkov.EPGConfig
+import com.volkov.EPGConfig.marginStart
 import com.volkov.epg_recycler.databinding.ItemShowBinding
 import com.volkov.epgrecycler.EPGUtils.SHOW_TIME_PATTERN
 import com.volkov.epgrecycler.EPGUtils.endTime
@@ -27,7 +23,6 @@ import com.volkov.epgrecycler.dpToPx
 import com.volkov.epgrecycler.setOnClickListenerDebounce
 import org.joda.time.DateTime
 
-
 class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val binding by viewBinding(ItemShowBinding::bind)
@@ -38,8 +33,12 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         binding.root.background =
             ContextCompat.getDrawable(context, EPGConfig.showBackgroundDrawable)
 
+        binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
+            marginStart = EPGConfig.marginStart.dpToPx
+        }
+
         binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon && item.showIndex == 0
-        binding.llShowName.updateLayoutParams<LinearLayout.LayoutParams> {
+        binding.llShowName.updateLayoutParams<ConstraintLayout.LayoutParams> {
             marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
         }
         if (EPGConfig.displayFirstShowIcon) {
@@ -54,10 +53,6 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 .load(item.showPreviewImage)
                 .apply(options)
                 .into(binding.ivShowImage)
-
-//            EPGConfig.transform?.let {
-//                builder.transform(it)
-//            }
         }
 
         val realStartDate = DateTime(item.startDate)

@@ -6,7 +6,6 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
-import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -272,7 +271,7 @@ class EPGRecyclerView @JvmOverloads constructor(
                     val channelId = v.first().toInt()
                     channels.singleOrNull { channel -> channel.id == channelId }?.let { channel ->
                         val currentShow = channel.shows.getCurrentShow()
-                        findViewWithTag<LinearLayout>(tag).isActivated = currentShow?.id == v[1]
+                        findViewWithTag<View>(tag).isActivated = currentShow?.id == v[1]
                     }
                 }
             }
@@ -378,10 +377,6 @@ class EPGRecyclerView @JvmOverloads constructor(
         return this.filter {
             it.startDate.isBefore(endTime) && it.endDate.isAfter(DateTime())
         }
-    }
-
-    private fun List<ShowModel>.extendFirstShowIfNeeded(): List<ShowModel> {
-        return emptyList()
     }
 
     private fun List<ChannelModel>.mapChannels(): List<DataModel.ChannelDataModel> {

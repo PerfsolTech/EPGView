@@ -21,9 +21,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         super.onCreate(savedInstanceState)
         with(EPGConfig) {
             displayFirstShowIcon = true
-            marginTop = 10
-            rowHeight = 90
-            transform = listOf(FitCenter(), GranularRoundedCorners(100f, 0f, 0f, 100f))
+            marginTop = 8
+            marginStart = 8
+            rowHeight = 50
         }
         binding.epgView.apply {
             setDayShift(0)

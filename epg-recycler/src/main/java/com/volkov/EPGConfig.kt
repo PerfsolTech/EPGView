@@ -20,6 +20,7 @@ object EPGConfig {
 
     // margin in dp
     var marginTop = 0
+    var marginStart = 0
 
     @DrawableRes
     var showBackgroundDrawable = R.drawable.show_background
