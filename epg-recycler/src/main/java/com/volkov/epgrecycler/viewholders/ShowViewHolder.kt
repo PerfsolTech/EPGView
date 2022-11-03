@@ -22,6 +22,7 @@ import com.volkov.epgrecycler.context
 import com.volkov.epgrecycler.dpToPx
 import com.volkov.epgrecycler.setOnClickListenerDebounce
 import org.joda.time.DateTime
+import org.joda.time.Seconds
 
 class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -38,6 +39,13 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
 
         binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon && item.showIndex == 0
+
+        val progressMax = Seconds.secondsBetween(item.startDate, item.endDate).seconds
+        val progress = Seconds.secondsBetween(item.startDate, DateTime.now()).seconds
+        binding.pbLine.isVisible = EPGConfig.isProgressVisible && binding.ivShowImage.isVisible
+        binding.pbLine.max = progressMax
+        binding.pbLine.progress = progress
+
         binding.llShowName.updateLayoutParams<ConstraintLayout.LayoutParams> {
             marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
         }

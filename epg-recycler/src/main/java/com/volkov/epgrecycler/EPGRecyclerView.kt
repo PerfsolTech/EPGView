@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.bumptech.glide.Glide.init
 import com.volkov.epg_recycler.R
 import com.volkov.epg_recycler.databinding.ViewEpgRecyclerBinding
 import com.volkov.epgrecycler.Constants.TIME_HEADER
@@ -91,6 +92,51 @@ class EPGRecyclerView @JvmOverloads constructor(
     private val channelsLogoAdapter = ChannelsLogoAdapter()
     private var timeLineScrollPosition = 0
 
+    private val showFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+        if (hasFocus) {
+            val ar = lastSelectedShowView?.tag?.toString()?.split("#")
+                ?: return@OnFocusChangeListener
+            val channelId = ar[0].toInt()
+            val showId = ar[1]
+            val currentChannel = channels.single { it.id == channelId }
+            val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
+            val foundingShow = when (lastDirection) {
+                MoveDirection.UP -> {
+                    currentShow?.let {
+                        (channels.getOrNull(channels.indexOf(currentChannel) - 1)
+                            ?: channels.firstOrNull())
+                            ?.findShowStartAfterTime(
+                                currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
+                            )
+                    }
+                }
+                MoveDirection.DOWN -> {
+                    currentShow?.let {
+                        channels.getOrNull(channels.indexOf(currentChannel) + 1)
+                            ?.findShowStartAfterTime(
+                                currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
+                            )
+                    }
+                }
+                else -> null
+            }
+            foundingShow?.let { show ->
+                val rv =
+                    binding.rvChannels.findViewWithTag<RecyclerView>("channel_${show.channelId}")
+                rv?.post {
+                    val children = rv.children.toList()
+                    val view =
+                        rv.findViewWithTag<View>(show.showTag).takeIf { it.isViewOnScreen }
+                            ?: children.getOrNull(children.size - 2)
+                    view?.requestFocus()
+                }
+            } ?: run {
+                (binding.rvChannels.children.firstOrNull() as? RecyclerView)
+                    ?.children?.firstOrNull()?.requestFocus()
+            }
+        }
+    }
+
     init {
         inflate(context, R.layout.view_epg_recycler, this)
         binding.rvTimeLine.apply {
@@ -126,50 +172,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             setHasFixedSize(true)
             itemAnimator = null
             addOnScrollListener(verticalScrollListener)
-            setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    val ar = lastSelectedShowView?.tag?.toString()?.split("#")
-                        ?: return@setOnFocusChangeListener
-                    val channelId = ar[0].toInt()
-                    val showId = ar[1]
-                    val currentChannel = channels.single { it.id == channelId }
-                    val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
-                    val foundingShow = when (lastDirection) {
-                        MoveDirection.UP -> {
-                            currentShow?.let {
-                                (channels.getOrNull(channels.indexOf(currentChannel) - 1)
-                                    ?: channels.firstOrNull())
-                                    ?.findShowStartAfterTime(
-                                        currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                                    )
-                            }
-                        }
-                        MoveDirection.DOWN -> {
-                            currentShow?.let {
-                                channels.getOrNull(channels.indexOf(currentChannel) + 1)
-                                    ?.findShowStartAfterTime(
-                                        currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                                    )
-                            }
-                        }
-                        else -> null
-                    }
-                    foundingShow?.let { show ->
-                        val rv =
-                            binding.rvChannels.findViewWithTag<RecyclerView>("channel_${show.channelId}")
-                        rv?.post {
-                            val children = rv.children.toList()
-                            val view =
-                                rv.findViewWithTag<View>(show.showTag).takeIf { it.isViewOnScreen }
-                                    ?: children.getOrNull(children.size - 2)
-                            view?.requestFocus()
-                        }
-                    } ?: run {
-                        (binding.rvChannels.children.firstOrNull() as? RecyclerView)
-                            ?.children?.firstOrNull()?.requestFocus()
-                    }
-                }
-            }
+            onFocusChangeListener = showFocusChangeListener
         }
         binding.root.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
             if (oldFocus != null) {
@@ -245,7 +248,8 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     private fun initChannelRecycler() {
         binding.rvChannels.apply {
-            val channelListAdapter = ChannelListAdapter(horizontalScrollListener, listener)
+            val channelListAdapter =
+                ChannelListAdapter(horizontalScrollListener, showFocusChangeListener, listener)
             layoutManager = object : LinearLayoutManager(context) {
                 override fun onInterceptFocusSearch(focused: View, direction: Int): View? = null
             }

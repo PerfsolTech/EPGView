@@ -26,4 +26,5 @@ object EPGConfig {
     var showBackgroundDrawable = R.drawable.show_background
     var displayFirstShowIcon = false
     var transform: List<BitmapTransformation>? = null
+    var isProgressVisible = false
 }

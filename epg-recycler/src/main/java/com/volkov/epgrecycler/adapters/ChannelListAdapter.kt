@@ -1,5 +1,6 @@
 package com.volkov.epgrecycler.adapters
 
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -11,6 +12,7 @@ import com.volkov.epgrecycler.viewholders.ChannelViewHolder
 
 class ChannelListAdapter(
     private val horizontalScrollListener: RecyclerView.OnScrollListener,
+    private val focusListener: View.OnFocusChangeListener,
     private val listener: EPGRecyclerView.OnEventListener? = null,
 ) : ListAdapter<DataModel, ChannelViewHolder>(DiffCallback()) {
 
@@ -23,6 +25,7 @@ class ChannelListAdapter(
         holder.bind(
             getItem(position) as DataModel.ChannelDataModel,
             horizontalScrollListener,
+            focusListener,
             listener,
         )
     }

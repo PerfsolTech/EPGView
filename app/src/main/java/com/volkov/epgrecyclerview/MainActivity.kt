@@ -3,11 +3,6 @@ package com.volkov.epgrecyclerview
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.load.resource.bitmap.CenterCrop
-import com.bumptech.glide.load.resource.bitmap.CenterInside
-import com.bumptech.glide.load.resource.bitmap.FitCenter
-import com.bumptech.glide.load.resource.bitmap.GranularRoundedCorners
-import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.volkov.EPGConfig
 import com.volkov.epgrecycler.models.epg.ChannelModel
 import com.volkov.epgrecycler.models.epg.ShowModel
@@ -24,10 +19,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             marginTop = 8
             marginStart = 8
             rowHeight = 50
+            isProgressVisible = true
         }
         binding.epgView.apply {
             setDayShift(0)
-            val startDate = DateTime()
+            val startDate = DateTime().minusMinutes(10)
             setStartHour(startDate.hourOfDay - 1)
             initView(
                 listOf(

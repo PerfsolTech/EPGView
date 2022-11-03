@@ -58,9 +58,12 @@
         android:layout_width="0dp"
         android:layout_height="2dp"
         android:layout_marginHorizontal="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/white"
         android:indeterminate="false"
         android:indeterminateOnly="false"
+        android:progress="10"
+        android:progressBackgroundTint="@color/red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/iv_show_image"
         app:layout_constraintStart_toStartOf="@id/iv_show_image" />

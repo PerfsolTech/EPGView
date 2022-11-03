@@ -29,7 +29,8 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     fun bind(
         item: DataModel.ChannelDataModel,
         horizontalScrollListener: RecyclerView.OnScrollListener,
-        eventListener: EPGRecyclerView.OnEventListener? = null,
+        focusListener: View.OnFocusChangeListener,
+        eventListener: EPGRecyclerView.OnEventListener? = null
     ) {
         binding.root.tag = "channel_${item.channelId}"
 
@@ -46,6 +47,7 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             layoutManager = lm
             setHasFixedSize(false)
             this.scrollListener = horizontalScrollListener
+            this.onFocusChangeListener = focusListener
         }
         val showDataModelList: MutableList<DataModel> = item.shows.mapIndexed { index, show ->
             DataModel.ShowDataModel(
