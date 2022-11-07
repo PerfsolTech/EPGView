@@ -11,7 +11,6 @@ import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.volkov.EPGConfig
-import com.volkov.EPGConfig.marginStart
 import com.volkov.epg_recycler.databinding.ItemShowBinding
 import com.volkov.epgrecycler.EPGUtils.SHOW_TIME_PATTERN
 import com.volkov.epgrecycler.EPGUtils.endTime
@@ -35,7 +34,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             ContextCompat.getDrawable(context, EPGConfig.showBackgroundDrawable)
 
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
-            marginStart = EPGConfig.marginStart.dpToPx
+            marginEnd = EPGConfig.marginEnd.dpToPx
         }
 
         binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon && item.showIndex == 0
@@ -48,6 +47,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         binding.llShowName.updateLayoutParams<ConstraintLayout.LayoutParams> {
             marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
+            marginEnd = marginStart
         }
         if (EPGConfig.displayFirstShowIcon) {
             val options = RequestOptions().apply {

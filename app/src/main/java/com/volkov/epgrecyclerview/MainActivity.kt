@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
         with(EPGConfig) {
             displayFirstShowIcon = true
             marginTop = 8
-            marginStart = 8
+            marginEnd = 8
             rowHeight = 50
             isProgressVisible = true
         }

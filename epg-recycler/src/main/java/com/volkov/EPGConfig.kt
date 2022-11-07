@@ -2,7 +2,6 @@ package com.volkov
 
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.volkov.epg_recycler.R
 
@@ -20,11 +19,13 @@ object EPGConfig {
 
     // margin in dp
     var marginTop = 0
-    var marginStart = 0
+    var marginEnd = 0
 
     @DrawableRes
     var showBackgroundDrawable = R.drawable.show_background
     var displayFirstShowIcon = false
     var transform: List<BitmapTransformation>? = null
     var isProgressVisible = false
+
+    var focusDelay : Long = 0L
 }

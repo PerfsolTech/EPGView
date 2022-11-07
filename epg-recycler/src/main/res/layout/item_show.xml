@@ -21,11 +21,12 @@
 
     <LinearLayout
         android:id="@+id/ll_show_name"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="10dp"
+        android:layout_marginHorizontal="10dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/iv_show_image"
         app:layout_constraintTop_toTopOf="parent">
 

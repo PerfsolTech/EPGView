@@ -6,6 +6,7 @@ import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnFocusChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
@@ -14,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
-import com.bumptech.glide.Glide.init
+import com.volkov.EPGConfig
 import com.volkov.epg_recycler.R
 import com.volkov.epg_recycler.databinding.ViewEpgRecyclerBinding
 import com.volkov.epgrecycler.Constants.TIME_HEADER
@@ -123,16 +124,19 @@ class EPGRecyclerView @JvmOverloads constructor(
             foundingShow?.let { show ->
                 val rv =
                     binding.rvChannels.findViewWithTag<RecyclerView>("channel_${show.channelId}")
-                rv?.post {
+                rv?.postDelayed({
                     val children = rv.children.toList()
                     val view =
                         rv.findViewWithTag<View>(show.showTag).takeIf { it.isViewOnScreen }
                             ?: children.getOrNull(children.size - 2)
                     view?.requestFocus()
-                }
+                }, EPGConfig.focusDelay)
             } ?: run {
                 (binding.rvChannels.children.firstOrNull() as? RecyclerView)
-                    ?.children?.firstOrNull()?.requestFocus()
+                    ?.children?.firstOrNull()?.let {
+                        it.postDelayed({ it.requestFocus() }, EPGConfig.focusDelay)
+                    }
+
             }
         }
     }
