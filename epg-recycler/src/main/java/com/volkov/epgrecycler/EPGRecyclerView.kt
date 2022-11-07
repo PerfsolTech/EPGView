@@ -62,7 +62,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         UP, DOWN, LEFT, RIGHT, NONE
     }
 
-    private var lastDirection = MoveDirection.NONE
+    var lastDirection = MoveDirection.NONE
 
     private val horizontalScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
