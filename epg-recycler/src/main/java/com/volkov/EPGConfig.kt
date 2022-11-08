@@ -13,6 +13,9 @@ object EPGConfig {
     @ColorRes
     var channelLogoBackground = R.color.time_header_blue
 
+    @DrawableRes
+    var channelLogoBackgroundDrawable: Int? = null
+
     @ColorRes
     var timeHeaderColor = android.R.color.white
 

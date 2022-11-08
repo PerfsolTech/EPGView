@@ -206,6 +206,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         binding.verticalDelimiter.isVisible = EPGConfig.showDelimiter
         binding.tvCurrentTime.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
         binding.rvTimeLine.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
+        binding.rvChannelsLogos.setBackgroundColor(context.getColor(EPGConfig.channelLogoBackground))
     }
 
     private fun ChannelModel.findShowStartAfterTime(time: DateTime): ShowModel? {

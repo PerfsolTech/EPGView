@@ -30,7 +30,7 @@ class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             .apply(options)
             .into(binding.root)
 
-        binding.root.setBackgroundColor(context.getColor(EPGConfig.channelLogoBackground))
+        binding.root.background = EPGConfig.channelLogoBackgroundDrawable?.let { context.getDrawable(it) }
 
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
             height = EPGConfig.rowHeight.dpToPx
