@@ -2,6 +2,7 @@ package com.volkov.epgrecycler.viewholders
 
 import android.view.View
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
@@ -31,10 +32,12 @@ class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             .into(binding.root)
 
         binding.root.background = EPGConfig.channelLogoBackgroundDrawable?.let { context.getDrawable(it) }
+        val gap = EPGConfig.marginTop.dpToPx
+        binding.root.updatePadding(left = gap, right = gap)
 
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
             height = EPGConfig.rowHeight.dpToPx
-            topMargin = EPGConfig.marginTop.dpToPx
+            topMargin = gap
         }
     }
 }
