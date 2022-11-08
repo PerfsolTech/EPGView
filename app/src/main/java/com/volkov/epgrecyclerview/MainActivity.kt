@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             marginEnd = 8
             rowHeight = 50
             isProgressVisible = true
+            showDelimiter = false
         }
         binding.epgView.apply {
             setDayShift(0)

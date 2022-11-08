@@ -143,11 +143,8 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_epg_recycler, this)
-        binding.verticalDelimiter.isVisible = EPGConfig.showDelimiter
-        binding.tvCurrentTime.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
         binding.rvTimeLine.apply {
             tag = TIME_HEADER
-            setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
             layoutManager = LinearLayoutManager(context, HORIZONTAL, false)
             adapter = timeAdapter
             setHasFixedSize(true)
@@ -193,6 +190,7 @@ class EPGRecyclerView @JvmOverloads constructor(
     }
 
     fun initView(channels: List<ChannelModel>) {
+        initUI()
         setTimeHeader()
         if (channels.isEmpty()) return
         this.channels = channels.map { it.copy(shows = it.shows.filterShows()) }
@@ -202,6 +200,12 @@ class EPGRecyclerView @JvmOverloads constructor(
         setChannels(mappedChannels)
         scrollToNow()
         selectCurrentShow(channels.first().id)
+    }
+
+    private fun initUI() {
+        binding.verticalDelimiter.isVisible = EPGConfig.showDelimiter
+        binding.tvCurrentTime.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
+        binding.rvTimeLine.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
     }
 
     private fun ChannelModel.findShowStartAfterTime(time: DateTime): ShowModel? {
