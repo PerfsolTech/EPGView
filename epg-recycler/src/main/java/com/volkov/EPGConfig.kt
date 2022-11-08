@@ -11,7 +11,12 @@ object EPGConfig {
     var timeHeaderBackground = R.color.time_header_blue
 
     @ColorRes
+    var channelLogoBackground = R.color.time_header_blue
+
+    @ColorRes
     var timeHeaderColor = android.R.color.white
+
+    var showDelimiter = true
 
     /** channel row */
     // height in DP
@@ -25,6 +30,7 @@ object EPGConfig {
     var showBackgroundDrawable = R.drawable.show_background
     var displayFirstShowIcon = false
     var transform: List<BitmapTransformation>? = null
+    var logoTransform: List<BitmapTransformation>? = null
     var isProgressVisible = false
 
     var focusDelay : Long = 0L
