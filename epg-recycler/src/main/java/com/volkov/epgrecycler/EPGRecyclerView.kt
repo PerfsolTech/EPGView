@@ -142,9 +142,9 @@ class EPGRecyclerView @JvmOverloads constructor(
     }
 
     init {
+        inflate(context, R.layout.view_epg_recycler, this)
         binding.verticalDelimiter.isVisible = EPGConfig.showDelimiter
         binding.tvCurrentTime.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
-        inflate(context, R.layout.view_epg_recycler, this)
         binding.rvTimeLine.apply {
             tag = TIME_HEADER
             setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
