@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                         shows = listOf(
                             ShowModel(
                                 id = "show_1",
-                                channelId = 1,
+                                channelId = "1",
                                 name = "The Simpsons",
                                 startDate = startDate,
                                 endDate = startDate.plusMinutes(50),
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                             ),
                             ShowModel(
                                 id = "show_2",
-                                channelId = 1,
+                                channelId = "1",
                                 name = "The Simpsons 2",
                                 startDate = startDate.plusMinutes(50),
                                 endDate = startDate.plusMinutes(140),
