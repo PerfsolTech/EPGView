@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             initView(
                 listOf(
                     ChannelModel(
-                        id = 1,
+                        id = "1",
                         logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
                         name = "Channel_1",
                         shows = listOf(

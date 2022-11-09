@@ -14,7 +14,7 @@ sealed class DataModel(val id: String) {
     ) : DataModel("TimeLineDataModel_$timeId")
 
     data class ChannelDataModel(
-        val channelId: Int,
+        val channelId: String,
         val channelName: String,
         val logo: String?,
         val shows: List<ShowModel>,
@@ -22,7 +22,7 @@ sealed class DataModel(val id: String) {
 
     data class ShowDataModel(
         val showIndex : Int,
-        val channelId: Int,
+        val channelId: String,
         val showId: String,
         val name: String,
         val showPreviewImage: String?,
@@ -33,7 +33,7 @@ sealed class DataModel(val id: String) {
     ) : DataModel("ShowDataModel_${showId}_${channelId}_${startDate}_${endDate}")
 
     data class EmptyShow(
-        val channelId: Int,
+        val channelId: String,
         val isStart: Boolean,
         val width: Int
     ) : DataModel("EmptyShow_${channelId}_${isStart}_$width")

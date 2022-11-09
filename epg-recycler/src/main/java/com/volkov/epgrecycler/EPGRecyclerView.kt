@@ -46,13 +46,13 @@ class EPGRecyclerView @JvmOverloads constructor(
     private val binding by viewBinding(ViewEpgRecyclerBinding::bind)
 
     private var channels: List<ChannelModel> = emptyList()
-    private val channelsMap = mutableMapOf<Int, Pair<String, String>>()
+    private val channelsMap = mutableMapOf<String, Pair<String, String>>()
 
     private var lastSelectedShowView: View? = null
 
     interface OnEventListener {
-        fun onShowSelected(channelId: Int, showId: String)
-        fun onShowClick(channelId: Int, showId: String)
+        fun onShowSelected(channelId: String, showId: String)
+        fun onShowClick(channelId: String, showId: String)
         fun onShowExit()
     }
 
@@ -97,7 +97,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         if (hasFocus) {
             val ar = lastSelectedShowView?.tag?.toString()?.split("#")
                 ?: return@OnFocusChangeListener
-            val channelId = ar[0].toInt()
+            val channelId = ar[0]
             val showId = ar[1]
             val currentChannel = channels.single { it.id == channelId }
             val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
@@ -220,7 +220,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         val focusedView: View?
         val id: String?
         val tag: String?
-        var channelId: Int? = null
+        var channelId: String? = null
         var showId: String? = null
         if (event.action == KeyEvent.ACTION_DOWN) {
             focusedView = findFocus()
@@ -228,7 +228,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             tag = focusedView.tag?.toString()
             if (id == "show_parent") {
                 tag?.split("#")?.apply {
-                    channelId = first().toInt()
+                    channelId = first()
                     showId = this[1]
                 }
             }
@@ -284,7 +284,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             it.children.toList().map { view -> view.tag?.toString() ?: "" }.forEach { tag ->
                 if (tag.isNotEmpty() && tag.contains("#")) {
                     val v = tag.split("#")
-                    val channelId = v.first().toInt()
+                    val channelId = v.first()
                     channels.singleOrNull { channel -> channel.id == channelId }?.let { channel ->
                         val currentShow = channel.shows.getCurrentShow()
                         findViewWithTag<View>(tag).isActivated = currentShow?.id == v[1]
@@ -294,7 +294,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
-    private fun selectCurrentShow(channelId: Int) {
+    private fun selectCurrentShow(channelId: String) {
         val channel = channels.singleOrNull { it.id == channelId } ?: return
         val currentShow = channel.shows.getCurrentShow()
         val tag = "${channelId}#${currentShow?.id}"
