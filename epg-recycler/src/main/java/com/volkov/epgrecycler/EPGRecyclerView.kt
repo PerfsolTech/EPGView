@@ -2,6 +2,7 @@ package com.volkov.epgrecycler
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -296,18 +297,21 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     private fun selectCurrentShow(channelId: String) {
         val channel = channels.singleOrNull { it.id == channelId } ?: return
-        val currentShow = channel.shows.getCurrentShow()
+        val currentShow =
+            if (dayShift == 0) channel.shows.getCurrentShow() else channel.shows.first()
         val tag = "${channelId}#${currentShow?.id}"
         postDelayed({
-            binding.rvChannels.children.toList().firstOrNull()?.findViewWithTag<View>(tag)
-                ?.requestFocus()
-        }, 50)
+            val show =
+                binding.rvChannels.children.toList().firstOrNull()?.findViewWithTag<View>(tag)
+            show?.requestFocus()
+        }, EPGConfig.focusDelay)
     }
 
     fun scrollToNow() {
-        if (dayShift != 0) return
         post {
-            val nowOffset = getCellWidth(startTime, DateTime()) - binding.rvChannels.width / 2
+            val nowOffset = if (dayShift == 0)
+                getCellWidth(startTime, DateTime()) - binding.rvChannels.width / 2
+            else 0
             val scrollBy = nowOffset - timeLineScrollPosition
             scrollTimeHeader(null, scrollBy)
             scrollAll(null, scrollBy)
