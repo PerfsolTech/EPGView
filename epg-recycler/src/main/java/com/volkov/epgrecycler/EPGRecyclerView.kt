@@ -2,7 +2,6 @@ package com.volkov.epgrecycler
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Log
 import android.view.Gravity
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -156,19 +155,6 @@ class EPGRecyclerView @JvmOverloads constructor(
                     return true
                 }
             })
-            setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    when (lastDirection) {
-                        MoveDirection.UP -> listener?.onShowExit()
-                        MoveDirection.DOWN -> lastSelectedShowView?.apply {
-                            post {
-                                requestFocus()
-                            }
-                        }
-                        else -> Unit
-                    }
-                }
-            }
         }
 
         binding.rvChannelsLogos.apply {
@@ -200,7 +186,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         setChannelsLogo(mappedChannels)
         setChannels(mappedChannels)
         scrollToNow()
-        selectCurrentShow(channels.first().id)
+        selectCurrentShow(channels.firstOrNull()?.id)
     }
 
     private fun initUI() {
@@ -249,6 +235,9 @@ class EPGRecyclerView @JvmOverloads constructor(
             }
             event.onUpPressed() -> {
                 lastDirection = MoveDirection.UP
+                if (channels.first().id == channelId) {
+                    listener?.onShowExit()
+                }
                 false
             }
             event.onDownPressed() -> {
@@ -295,10 +284,10 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
-    private fun selectCurrentShow(channelId: String) {
+    private fun selectCurrentShow(channelId: String?) {
         val channel = channels.singleOrNull { it.id == channelId } ?: return
         val currentShow =
-            if (dayShift == 0) channel.shows.getCurrentShow() else channel.shows.first()
+            if (dayShift == 0) channel.shows.getCurrentShow() else channel.shows.firstOrNull()
         val tag = "${channelId}#${currentShow?.id}"
         postDelayed({
             val show =
