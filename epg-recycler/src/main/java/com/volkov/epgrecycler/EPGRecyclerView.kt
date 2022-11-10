@@ -101,22 +101,23 @@ class EPGRecyclerView @JvmOverloads constructor(
             val showId = ar[1]
             val currentChannel = channels.single { it.id == channelId }
             val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
+            var nextChannel: ChannelModel? = null
             val foundingShow = when (lastDirection) {
                 MoveDirection.UP -> {
                     currentShow?.let {
-                        (channels.getOrNull(channels.indexOf(currentChannel) - 1)
+                        nextChannel = (channels.getOrNull(channels.indexOf(currentChannel) - 1)
                             ?: channels.firstOrNull())
-                            ?.findShowStartAfterTime(
-                                currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                            )
+                        nextChannel?.findShowStartAfterTime(
+                            currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
+                        )
                     }
                 }
                 MoveDirection.DOWN -> {
                     currentShow?.let {
-                        channels.getOrNull(channels.indexOf(currentChannel) + 1)
-                            ?.findShowStartAfterTime(
-                                currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                            )
+                        nextChannel = channels.getOrNull(channels.indexOf(currentChannel) + 1)
+                        nextChannel?.findShowStartAfterTime(
+                            currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
+                        )
                     }
                 }
                 else -> null
@@ -132,11 +133,25 @@ class EPGRecyclerView @JvmOverloads constructor(
                     view?.requestFocus()
                 }, EPGConfig.focusDelay)
             } ?: run {
-                (binding.rvChannels.children.firstOrNull() as? RecyclerView)
-                    ?.children?.firstOrNull()?.let {
-                        it.postDelayed({ it.requestFocus() }, EPGConfig.focusDelay)
+                val rv = binding.rvChannels.children.firstOrNull() as? RecyclerWithPositionView
+                val firstChild = rv?.children?.firstOrNull()
+                firstChild?.let {
+                    if (resources.getResourceEntryName(firstChild.id) == "ll_empty") {
+                        post {
+                            nextChannel?.let { channel ->
+                                val nowOffset =
+                                    getCellWidth(currentEpgTime, channel.shows[0].startDate)
+                                val scrollBy = timeLineScrollPosition - nowOffset
+                                scrollTimeHeader(null, scrollBy)
+                                scrollAll(null, scrollBy)
+                            }
+                        }
+                        return@let
                     }
-
+                    firstChild.postDelayed({
+                        firstChild.requestFocus()
+                    }, EPGConfig.focusDelay)
+                }
             }
         }
     }
