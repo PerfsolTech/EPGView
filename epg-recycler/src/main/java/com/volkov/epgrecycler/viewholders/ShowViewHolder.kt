@@ -2,7 +2,6 @@ package com.volkov.epgrecycler.viewholders
 
 import android.annotation.SuppressLint
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -37,7 +36,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             marginEnd = EPGConfig.marginEnd.dpToPx
         }
 
-        binding.ivShowImage.isVisible = EPGConfig.displayFirstShowIcon && item.showIndex == 0
+        binding.ivShowImage.isVisible = EPGConfig.displayPreviewForLiveShow && item.isLiveShow
 
         val progressMax = Seconds.secondsBetween(item.startDate, item.endDate).seconds
         val progress = Seconds.secondsBetween(item.startDate, DateTime.now()).seconds
@@ -45,11 +44,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         binding.pbLine.max = progressMax
         binding.pbLine.progress = progress
 
-        binding.llShowName.updateLayoutParams<ConstraintLayout.LayoutParams> {
-            marginStart = if (EPGConfig.displayFirstShowIcon) 10.dpToPx else 0
-            marginEnd = marginStart
-        }
-        if (EPGConfig.displayFirstShowIcon) {
+        if (binding.ivShowImage.isVisible) {
             val options = RequestOptions().apply {
                 EPGConfig.transform?.let { list ->
                     list.map {
@@ -68,8 +63,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val start = if (item.startDate.isBefore(startTime)) startTime else item.startDate
         val end = if (item.endDate.isAfter(endTime)) endTime else item.endDate
 
-        val isActivated = realStartDate.isBeforeNow && realEndDate.isAfterNow
-        binding.showParent.isActivated = isActivated
+        binding.showParent.isActivated = item.isLiveShow
 
         binding.tvTitle.text = item.name
         binding.tvSubTitle.text =
@@ -89,4 +83,7 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             item.onShowClick.invoke()
         }
     }
+
+    private val DataModel.ShowDataModel.isLiveShow: Boolean
+        get() = startDate.isBeforeNow && endDate.isAfterNow
 }

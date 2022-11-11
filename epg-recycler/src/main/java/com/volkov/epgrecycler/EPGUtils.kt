@@ -14,6 +14,7 @@ object EPGUtils {
 
     var dayShift = 0
     var startHour = 0
+    var endHour = 0
 
     var currentEpgTime: DateTime = startTime
 
@@ -45,5 +46,5 @@ object EPGUtils {
             .withMillisOfSecond(0)
 
     val endTime: DateTime
-        get() = startTime.plusDays(1)
+        get() = startTime.plusDays(1).withHourOfDay(endHour)
 }

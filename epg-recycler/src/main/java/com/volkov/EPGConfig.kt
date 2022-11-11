@@ -31,10 +31,11 @@ object EPGConfig {
 
     @DrawableRes
     var showBackgroundDrawable = R.drawable.show_background
-    var displayFirstShowIcon = false
+    var displayPreviewForLiveShow = false
     var transform: List<BitmapTransformation>? = null
     var logoTransform: List<BitmapTransformation>? = null
     var isProgressVisible = false
+    var showTimeLine = true
 
     var focusDelay : Long = 0L
 }

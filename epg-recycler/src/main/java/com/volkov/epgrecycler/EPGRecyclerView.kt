@@ -21,7 +21,6 @@ import com.volkov.epg_recycler.databinding.ViewEpgRecyclerBinding
 import com.volkov.epgrecycler.Constants.TIME_HEADER
 import com.volkov.epgrecycler.EPGUtils.currentEpgTime
 import com.volkov.epgrecycler.EPGUtils.dayShift
-import com.volkov.epgrecycler.EPGUtils.endTime
 import com.volkov.epgrecycler.EPGUtils.getCellWidth
 import com.volkov.epgrecycler.EPGUtils.getCellWidthSeconds
 import com.volkov.epgrecycler.EPGUtils.getDayLength
@@ -77,6 +76,10 @@ class EPGRecyclerView @JvmOverloads constructor(
         EPGUtils.startHour = startHour
     }
 
+    fun setEndHour(endHour: Int) {
+        EPGUtils.endHour = endHour
+    }
+
     fun setDayShift(day: Int) {
         if (day < 0 || day > 6) return
         dayShift = day
@@ -101,7 +104,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             val showId = ar[1]
             val currentChannel = channels.single { it.id == channelId }
             val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
-            var nextChannel: ChannelModel? = null
+            var nextChannel: ChannelModel?
             val foundingShow = when (lastDirection) {
                 MoveDirection.UP -> {
                     currentShow?.let {
@@ -136,18 +139,6 @@ class EPGRecyclerView @JvmOverloads constructor(
                 val rv = binding.rvChannels.children.firstOrNull() as? RecyclerWithPositionView
                 val firstChild = rv?.children?.firstOrNull()
                 firstChild?.let {
-                    if (resources.getResourceEntryName(firstChild.id) == "ll_empty") {
-                        post {
-                            nextChannel?.let { channel ->
-                                val nowOffset =
-                                    getCellWidth(currentEpgTime, channel.shows[0].startDate)
-                                val scrollBy = timeLineScrollPosition - nowOffset
-                                scrollTimeHeader(null, scrollBy)
-                                scrollAll(null, scrollBy)
-                            }
-                        }
-                        return@let
-                    }
                     firstChild.postDelayed({
                         firstChild.requestFocus()
                     }, EPGConfig.focusDelay)
@@ -195,7 +186,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         initUI()
         setTimeHeader()
         if (channels.isEmpty()) return
-        this.channels = channels.map { it.copy(shows = it.shows.filterShows()) }
+        this.channels = channels
         initChannelRecycler()
         val mappedChannels = this.channels.mapChannels()
         setChannelsLogo(mappedChannels)
@@ -280,7 +271,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         val now = DateTime()
         val indicatorPosition = getCellWidthSeconds(startTime, now)
         val isVisible = indicatorPosition - timeLineScrollPosition in (0..binding.rvTimeLine.width)
-        binding.timeIndicator.isVisible = isVisible
+        binding.timeIndicator.isVisible = isVisible && EPGConfig.showTimeLine
         binding.timeIndicator.updateLayoutParams<LayoutParams> {
             marginStart = getCellWidthSeconds(currentEpgTime, now)
         }
@@ -394,12 +385,6 @@ class EPGRecyclerView @JvmOverloads constructor(
                 scrollBy(0, dy)
                 addOnScrollListener(verticalScrollListener)
             }
-        }
-    }
-
-    private fun List<ShowModel>.filterShows(): List<ShowModel> {
-        return this.filter {
-            it.startDate.isBefore(endTime) && it.endDate.isAfter(DateTime())
         }
     }
 
