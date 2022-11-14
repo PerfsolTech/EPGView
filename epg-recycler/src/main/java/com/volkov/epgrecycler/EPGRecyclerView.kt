@@ -161,6 +161,19 @@ class EPGRecyclerView @JvmOverloads constructor(
                     return true
                 }
             })
+            setOnFocusChangeListener { _, hasFocus ->
+                if (hasFocus) {
+                    when (lastDirection) {
+                        MoveDirection.UP -> listener?.onShowExit()
+                        MoveDirection.DOWN -> lastSelectedShowView?.apply {
+                            post {
+                                requestFocus()
+                            }
+                        }
+                        else -> Unit
+                    }
+                }
+            }
         }
 
         binding.rvChannelsLogos.apply {
