@@ -15,11 +15,9 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         with(EPGConfig) {
-            displayPreviewForLiveShow = true
             marginTop = 8
             marginEnd = 8
             rowHeight = 50
-            isProgressVisible = true
             showDelimiter = false
         }
         binding.epgView.apply {
@@ -31,6 +29,163 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             initView(
                 listOf(
                     ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ),
+                    ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ),
+                    ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ),
+                    ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ), ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ), ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ), ChannelModel(
+                        id = "1",
+                        logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
+                        name = "Channel_1",
+                        shows = listOf(
+                            ShowModel(
+                                id = "show_1",
+                                channelId = "1",
+                                name = "The Simpsons",
+                                startDate = startDate,
+                                endDate = endTime,
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            ),
+                            ShowModel(
+                                id = "show_2",
+                                channelId = "1",
+                                name = "The Simpsons 2",
+                                startDate = endTime,
+                                endDate = endTime.plusMinutes(20),
+                                showPreviewImage = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg"
+                            )
+                        )
+                    ), ChannelModel(
                         id = "1",
                         logo = "https://hatrabbits.com/wp-content/uploads/2017/01/random.jpg",
                         name = "Channel_1",

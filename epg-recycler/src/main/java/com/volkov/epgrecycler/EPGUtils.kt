@@ -1,6 +1,7 @@
 package com.volkov.epgrecycler
 
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Hours
 import org.joda.time.Minutes
 import org.joda.time.Seconds
@@ -15,6 +16,7 @@ object EPGUtils {
     var dayShift = 0
     var startHour = 0
     var endHour = 0
+    var timeZone = DateTimeZone.getDefault()
 
     var currentEpgTime: DateTime = startTime
 
@@ -44,6 +46,7 @@ object EPGUtils {
             .withMinuteOfHour(0)
             .withSecondOfMinute(0)
             .withMillisOfSecond(0)
+            .withZoneRetainFields(timeZone)
 
     val endTime: DateTime
         get() = startTime.plusDays(1).withHourOfDay(endHour)

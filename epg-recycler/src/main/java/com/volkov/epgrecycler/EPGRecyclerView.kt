@@ -35,6 +35,7 @@ import com.volkov.epgrecycler.adapters.models.DataModel
 import com.volkov.epgrecycler.models.epg.ChannelModel
 import com.volkov.epgrecycler.models.epg.ShowModel
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import org.joda.time.Minutes
 import kotlin.math.max
 
@@ -70,6 +71,10 @@ class EPGRecyclerView @JvmOverloads constructor(
             scrollTimeHeader(recyclerView, dx)
             updateTimeIndicator(withSubmit = false)
         }
+    }
+
+    fun setTimeZone(zone: DateTimeZone) {
+        EPGUtils.timeZone = zone
     }
 
     fun setStartHour(startHour: Int) {
@@ -195,7 +200,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
-    fun initView(channels: List<ChannelModel>) {
+    fun initView(channels: List<ChannelModel>, initChannel: String? = null) {
         initUI()
         setTimeHeader()
         if (channels.isEmpty()) return
@@ -205,7 +210,9 @@ class EPGRecyclerView @JvmOverloads constructor(
         setChannelsLogo(mappedChannels)
         setChannels(mappedChannels)
         scrollToNow()
-        selectCurrentShow(channels.firstOrNull()?.id)
+        post {
+            selectCurrentShow(initChannel ?: channels.firstOrNull()?.id)
+        }
     }
 
     private fun initUI() {
@@ -234,7 +241,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             tag = focusedView.tag?.toString()
             if (id == "show_parent") {
                 tag?.split("#")?.apply {
-                    channelId = first()
+                    channelId = firstOrNull() ?: return false
                     showId = this[1]
                 }
             }
@@ -254,7 +261,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             }
             event.onUpPressed() -> {
                 lastDirection = MoveDirection.UP
-                if (channels.first().id == channelId) {
+                if (channels.firstOrNull()?.id == channelId) {
                     listener?.onShowExit()
                 }
                 false
@@ -293,7 +300,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             it.children.toList().map { view -> view.tag?.toString() ?: "" }.forEach { tag ->
                 if (tag.isNotEmpty() && tag.contains("#")) {
                     val v = tag.split("#")
-                    val channelId = v.first()
+                    val channelId = v.firstOrNull()
                     channels.singleOrNull { channel -> channel.id == channelId }?.let { channel ->
                         val currentShow = channel.shows.getCurrentShow()
                         findViewWithTag<View>(tag).isActivated = currentShow?.id == v[1]
@@ -305,12 +312,14 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     private fun selectCurrentShow(channelId: String?) {
         val channel = channels.singleOrNull { it.id == channelId } ?: return
+        val channelIndex = channels.indexOf(channel)
         val currentShow =
             if (dayShift == 0) channel.shows.getCurrentShow() else channel.shows.firstOrNull()
         val tag = "${channelId}#${currentShow?.id}"
         postDelayed({
-            val show =
-                binding.rvChannels.children.toList().firstOrNull()?.findViewWithTag<View>(tag)
+            val rvChannelsList = binding.rvChannels.children.toList()
+            val show = (rvChannelsList.getOrNull(channelIndex) ?: rvChannelsList.firstOrNull())
+                ?.findViewWithTag<View>(tag)
             show?.requestFocus()
         }, EPGConfig.focusDelay)
     }
@@ -404,7 +413,8 @@ class EPGRecyclerView @JvmOverloads constructor(
     private fun List<ChannelModel>.mapChannels(): List<DataModel.ChannelDataModel> {
         return this.map { channel ->
             if (channel.shows.isNotEmpty()) {
-                channelsMap[channel.id] = Pair(channel.shows.first().id, channel.shows.last().id)
+                channelsMap[channel.id] =
+                    Pair(channel.shows.firstOrNull()?.id ?: "", channel.shows.lastOrNull()?.id ?: "")
             }
             DataModel.ChannelDataModel(
                 channelId = channel.id,
