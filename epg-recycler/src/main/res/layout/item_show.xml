@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/show_background"
-    android:focusableInTouchMode="true"
+    android:focusable="false"
+    android:focusableInTouchMode="false"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -14,6 +15,7 @@
         android:id="@+id/iv_show_image"
         android:layout_width="100dp"
         android:layout_height="match_parent"
+        android:layout_margin="1dp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"

@@ -25,16 +25,19 @@
         android:background="@color/epg_grey"
         app:layout_constraintStart_toEndOf="@id/rv_channels_logos" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.volkov.epgrecycler.RecyclerWithPositionView
         android:id="@+id/rv_channels_logos"
         android:layout_width="100dp"
         android:layout_height="0dp"
         android:background="@color/channel_logos_blue_dark"
+        android:descendantFocusability="blocksDescendants"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_current_time" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.volkov.epgrecycler.RecyclerWithPositionView
         android:id="@+id/rv_time_line"
         android:layout_width="0dp"
         android:layout_height="40dp"
@@ -54,6 +57,7 @@
         android:id="@+id/rv_channels"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:descendantFocusability="blocksDescendants"
         android:focusable="false"
         android:focusableInTouchMode="false"
         app:layout_constraintBottom_toBottomOf="parent"

@@ -37,6 +37,8 @@ import com.volkov.epgrecycler.models.epg.ShowModel
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Minutes
+import timber.log.Timber
+import kotlin.math.abs
 import kotlin.math.max
 
 class EPGRecyclerView @JvmOverloads constructor(
@@ -62,8 +64,6 @@ class EPGRecyclerView @JvmOverloads constructor(
         UP, DOWN, LEFT, RIGHT, NONE
     }
 
-    var lastDirection = MoveDirection.NONE
-
     private val horizontalScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -73,6 +73,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
+    @Suppress("unused")
     fun setTimeZone(zone: DateTimeZone) {
         EPGUtils.timeZone = zone
     }
@@ -101,55 +102,8 @@ class EPGRecyclerView @JvmOverloads constructor(
     private val channelsLogoAdapter = ChannelsLogoAdapter()
     private var timeLineScrollPosition = 0
 
-    private val showFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
-        if (hasFocus) {
-            val ar = lastSelectedShowView?.tag?.toString()?.split("#")
-                ?: return@OnFocusChangeListener
-            val channelId = ar[0]
-            val showId = ar[1]
-            val currentChannel = channels.single { it.id == channelId }
-            val currentShow = currentChannel.shows.singleOrNull { it.id == showId }
-            var nextChannel: ChannelModel?
-            val foundingShow = when (lastDirection) {
-                MoveDirection.UP -> {
-                    currentShow?.let {
-                        nextChannel = (channels.getOrNull(channels.indexOf(currentChannel) - 1)
-                            ?: channels.firstOrNull())
-                        nextChannel?.findShowStartAfterTime(
-                            currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                        )
-                    }
-                }
-                MoveDirection.DOWN -> {
-                    currentShow?.let {
-                        nextChannel = channels.getOrNull(channels.indexOf(currentChannel) + 1)
-                        nextChannel?.findShowStartAfterTime(
-                            currentShow.startDate.plusMinutes(currentShow.showDuration / 2)
-                        )
-                    }
-                }
-                else -> null
-            }
-            foundingShow?.let { show ->
-                val rv =
-                    binding.rvChannels.findViewWithTag<RecyclerView>("channel_${show.channelId}")
-                rv?.postDelayed({
-                    val children = rv.children.toList()
-                    val view =
-                        rv.findViewWithTag<View>(show.showTag).takeIf { it.isViewOnScreen }
-                            ?: children.getOrNull(children.size - 2)
-                    view?.requestFocus()
-                }, EPGConfig.focusDelay)
-            } ?: run {
-                val rv = binding.rvChannels.children.firstOrNull() as? RecyclerWithPositionView
-                val firstChild = rv?.children?.firstOrNull()
-                firstChild?.let {
-                    firstChild.postDelayed({
-                        firstChild.requestFocus()
-                    }, EPGConfig.focusDelay)
-                }
-            }
-        }
+    private val focusListener = OnFocusChangeListener { _, hasFocus ->
+        if (hasFocus) lastSelectedShowView?.isSelected = true
     }
 
     init {
@@ -166,19 +120,6 @@ class EPGRecyclerView @JvmOverloads constructor(
                     return true
                 }
             })
-            setOnFocusChangeListener { _, hasFocus ->
-                if (hasFocus) {
-                    when (lastDirection) {
-                        MoveDirection.UP -> listener?.onShowExit()
-                        MoveDirection.DOWN -> lastSelectedShowView?.apply {
-                            post {
-                                requestFocus()
-                            }
-                        }
-                        else -> Unit
-                    }
-                }
-            }
         }
 
         binding.rvChannelsLogos.apply {
@@ -187,16 +128,7 @@ class EPGRecyclerView @JvmOverloads constructor(
             setHasFixedSize(true)
             itemAnimator = null
             addOnScrollListener(verticalScrollListener)
-            onFocusChangeListener = showFocusChangeListener
-        }
-        binding.root.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
-            if (oldFocus != null) {
-                val newId =
-                    runCatching { newFocus?.id?.let { resources.getResourceEntryName(it) } }
-                        .getOrDefault("")
-                if (newId != "show_parent") return@addOnGlobalFocusChangeListener
-                if (newFocus.isViewOnScreen) lastSelectedShowView = newFocus
-            }
+            onFocusChangeListener = focusListener
         }
     }
 
@@ -212,6 +144,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         scrollToNow()
         post {
             selectCurrentShow(initChannel ?: channels.firstOrNull()?.id)
+            binding.rvChannels.requestFocus()
         }
     }
 
@@ -222,53 +155,92 @@ class EPGRecyclerView @JvmOverloads constructor(
         binding.rvChannelsLogos.setBackgroundColor(context.getColor(EPGConfig.channelLogoBackground))
     }
 
-    private fun ChannelModel.findShowStartAfterTime(time: DateTime): ShowModel? {
-        return this.shows.find { show ->
-            show.startDate == time
-                    || (show.startDate.isBefore(time) && show.endDate.isAfter(time))
+    private fun getNextShowByDirection(direction: MoveDirection): View? {
+        val currentChannelTag = lastSelectedShowView?.tag?.toString()?.split("#") ?: return null
+        val channelId = currentChannelTag.firstOrNull() ?: return null
+        val showId = currentChannelTag.getOrNull(1) ?: return null
+        val currentChannel = channels.firstOrNull { it.id == channelId } ?: return null
+        val currentChannelIndex = channels.indexOf(currentChannel)
+        val (channel, desiredShow) = when (direction) {
+            MoveDirection.UP -> {
+                val prevChannel = channels.getOrNull(currentChannelIndex - 1) ?: return null
+                val currentChannelShow =
+                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
+                val foundingTime =
+                    currentChannelShow.startDate.plusMinutes(currentChannelShow.showDuration / 2 + 1)
+                val desiredShow = prevChannel.shows.singleOrNull {
+                    it.startDate.isBefore(foundingTime) && it.endDate.isAfter(foundingTime)
+                } ?: prevChannel.shows.firstOrNull {
+                    it.startDate.isAfter(foundingTime)
+                } ?: prevChannel.shows.lastOrNull {
+                    it.endDate.isBefore(foundingTime)
+                } ?: return null
+                Pair(prevChannel, desiredShow)
+            }
+            MoveDirection.DOWN -> {
+                val nextChannel = channels.getOrNull(currentChannelIndex + 1) ?: return null
+                val currentChannelShow =
+                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
+                val foundingTime =
+                    currentChannelShow.startDate.plusMinutes(currentChannelShow.showDuration / 2 + 1)
+                val desiredShow = nextChannel.shows.singleOrNull {
+                    it.startDate.isBefore(foundingTime) && it.endDate.isAfter(foundingTime)
+                } ?: nextChannel.shows.firstOrNull {
+                    it.startDate.isAfter(foundingTime)
+                } ?: nextChannel.shows.lastOrNull {
+                    it.endDate.isBefore(foundingTime)
+                } ?: return null
+                Pair(nextChannel, desiredShow)
+            }
+            MoveDirection.LEFT -> {
+                val currentChannelShow =
+                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
+                val currentShowIndex = currentChannel.shows.indexOf(currentChannelShow)
+                val desiredShow =
+                    currentChannel.shows.getOrNull(currentShowIndex - 1) ?: return null
+                Pair(currentChannel, desiredShow)
+            }
+            MoveDirection.RIGHT -> {
+                val currentChannelShow =
+                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
+                val currentShowIndex = currentChannel.shows.indexOf(currentChannelShow)
+                val desiredShow =
+                    currentChannel.shows.getOrNull(currentShowIndex + 1) ?: return null
+                Pair(currentChannel, desiredShow)
+            }
+            MoveDirection.NONE -> return null
         }
+        selectShow(channel, desiredShow)
+        return lastSelectedShowView
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        val focusedView: View?
-        val id: String?
-        val tag: String?
-        var channelId: String? = null
-        var showId: String? = null
-        if (event.action == KeyEvent.ACTION_DOWN) {
-            focusedView = findFocus()
-            id = resources.getResourceEntryName(focusedView.id)
-            tag = focusedView.tag?.toString()
-            if (id == "show_parent") {
-                tag?.split("#")?.apply {
-                    channelId = firstOrNull() ?: return false
-                    showId = this[1]
-                }
-            }
-        }
         return when {
-            event.onLeftPressed() -> {
-                lastDirection = MoveDirection.LEFT
-                channelId?.let {
-                    channelsMap[it]?.first == showId
-                } ?: false
-            }
-            event.onRightPressed() -> {
-                lastDirection = MoveDirection.RIGHT
-                channelId?.let {
-                    channelsMap[it]?.second == showId
-                } ?: false
+            event.onDownPressed() -> {
+                getNextShowByDirection(MoveDirection.DOWN)
+                true
             }
             event.onUpPressed() -> {
-                lastDirection = MoveDirection.UP
-                if (channels.firstOrNull()?.id == channelId) {
+                if (getNextShowByDirection(MoveDirection.UP) == null) {
+                    lastSelectedShowView?.isSelected = false
                     listener?.onShowExit()
                 }
-                false
+                true
             }
-            event.onDownPressed() -> {
-                lastDirection = MoveDirection.DOWN
-                false
+            event.onLeftPressed() -> {
+                getNextShowByDirection(MoveDirection.LEFT)
+                true
+            }
+            event.onRightPressed() -> {
+                getNextShowByDirection(MoveDirection.RIGHT)
+                true
+            }
+            event.onEnterPressed() -> {
+                lastSelectedShowView?.let {
+                    val tag = lastSelectedShowView?.tag.toString().split("#")
+                    listener?.onShowClick(tag[0], tag[1])
+                }
+                true
             }
             else -> super.dispatchKeyEvent(event)
         }
@@ -276,14 +248,14 @@ class EPGRecyclerView @JvmOverloads constructor(
 
     private fun initChannelRecycler() {
         binding.rvChannels.apply {
-            val channelListAdapter =
-                ChannelListAdapter(horizontalScrollListener, showFocusChangeListener, listener)
+            val channelListAdapter = ChannelListAdapter(horizontalScrollListener)
             layoutManager = object : LinearLayoutManager(context) {
                 override fun onInterceptFocusSearch(focused: View, direction: Int): View? = null
             }
             adapter = channelListAdapter
             setHasFixedSize(true)
             addOnScrollListener(verticalScrollListener)
+            onFocusChangeListener = focusListener
         }
     }
 
@@ -311,23 +283,106 @@ class EPGRecyclerView @JvmOverloads constructor(
     }
 
     private fun selectCurrentShow(channelId: String?) {
-        val channel = channels.singleOrNull { it.id == channelId } ?: return
+        val channel =
+            channels.singleOrNull { it.id == channelId } ?: channels.firstOrNull() ?: return
         val channelIndex = channels.indexOf(channel)
+        scrollVerticallyToPosition(channelIndex)
         val currentShow =
-            if (dayShift == 0) channel.shows.getCurrentShow() else channel.shows.firstOrNull()
-        val tag = "${channelId}#${currentShow?.id}"
+            if (dayShift == 0) channel.shows.getCurrentShow() ?: channel.shows.firstOrNull()
+            else channel.shows.firstOrNull()
+        currentShow?.let {
+            selectShow(channel, currentShow)
+        }
+    }
+
+    private fun scrollVerticallyToPosition(position: Int) {
+        val rowHeightPx = EPGConfig.rowHeight.dpToPx
+        val marginTopPx = EPGConfig.marginTop.dpToPx
+        val scrollToBot = marginTopPx * (position + 1) + rowHeightPx * (position + 1)
+        val scrollToTop = scrollToBot - rowHeightPx
+        val recycler = binding.rvChannelsLogos
+        val recyclerRange = recycler.verticalPosition..recycler.verticalPosition + recycler.height
+        if (scrollToTop in recyclerRange && scrollToBot in recyclerRange) return
+        val topScroll = abs(scrollToTop - recyclerRange.first)
+        val botScroll = abs(scrollToBot - recyclerRange.last)
+        if (topScroll < botScroll) {
+            scrollChannelsLogo(null, -topScroll)
+            scrollChannels(null, -topScroll)
+        } else {
+            scrollChannelsLogo(null, botScroll)
+            scrollChannels(null, botScroll)
+        }
+    }
+
+    fun selectShow(
+        channelId: String, showId: String
+    ) {
+        val channel = channels.singleOrNull { it.id == channelId } ?: return
+        val show = channel.shows.singleOrNull { it.id == showId } ?: return
+        selectShow(channel, show)
+    }
+
+    private fun selectShow(
+        channel: ChannelModel, show: ShowModel
+    ) {
+        scrollVerticallyToPosition(channels.indexOf(channel))
+        val tag = "${channel.id}#${show.id}"
         postDelayed({
-            val rvChannelsList = binding.rvChannels.children.toList()
-            val show = (rvChannelsList.getOrNull(channelIndex) ?: rvChannelsList.firstOrNull())
-                ?.findViewWithTag<View>(tag)
-            show?.requestFocus()
+            val channelRecycler =
+                binding.rvChannels.findViewWithTag<RecyclerWithPositionView>("channel_${channel.id}")
+                    ?: return@postDelayed
+
+            val showIndex = channel.shows.indexOf(show)
+
+            val start = if (show.startDate.isBefore(startTime)) startTime else show.startDate
+            val end = if (show.endDate.isAfter(EPGUtils.endTime)) EPGUtils.endTime else show.endDate
+            val showWidth = Minutes.minutesBetween(start, end).minutes * minuteToPixel
+            val scrollTo = Minutes.minutesBetween(
+                startTime, start
+            ).minutes * minuteToPixel + showIndex * EPGConfig.marginEnd.dpToPx
+
+            val scrollToEnd = Minutes.minutesBetween(
+                startTime, end
+            ).minutes * minuteToPixel + showIndex * EPGConfig.marginEnd.dpToPx
+            val recyclerRange =
+                channelRecycler.horizontalPosition..channelRecycler.horizontalPosition + channelRecycler.width
+            apply {
+                if (scrollTo in recyclerRange && scrollToEnd in recyclerRange) return@apply
+                // if show width less then screen width, trying to fit show to screen by sides
+                if (showWidth <= channelRecycler.width) {
+                    val leftScroll = abs(scrollTo - recyclerRange.first)
+                    val rightScroll = abs(scrollToEnd - recyclerRange.last)
+                    if (leftScroll < rightScroll) {
+                        scrollTimeHeader(null, -leftScroll)
+                        scrollAll(null, -leftScroll)
+                    } else {
+                        scrollTimeHeader(null, rightScroll)
+                        scrollAll(null, rightScroll)
+                    }
+                    // else scroll to start
+                } else {
+                    val scrollBy = scrollTo - timeLineScrollPosition
+                    scrollTimeHeader(null, scrollBy)
+                    scrollAll(null, scrollBy)
+                    updateTimeIndicator()
+                }
+            }
+
+
+            val showView = channelRecycler.findViewWithTag<View>(tag) ?: return@postDelayed
+            lastSelectedShowView?.isSelected = false
+            lastSelectedShowView = showView
+            showView.isSelected = true
+            listener?.onShowSelected(channel.id, show.id)
         }, EPGConfig.focusDelay)
     }
 
+    @Suppress("unused")
     fun scrollToNow() {
         post {
-            val nowOffset = if (dayShift == 0)
-                getCellWidth(startTime, DateTime()) - binding.rvChannels.width / 2
+            val nowOffset = if (dayShift == 0) getCellWidth(
+                startTime, DateTime()
+            ) - binding.rvChannels.width / 2
             else 0
             val scrollBy = nowOffset - timeLineScrollPosition
             scrollTimeHeader(null, scrollBy)
@@ -413,14 +468,18 @@ class EPGRecyclerView @JvmOverloads constructor(
     private fun List<ChannelModel>.mapChannels(): List<DataModel.ChannelDataModel> {
         return this.map { channel ->
             if (channel.shows.isNotEmpty()) {
-                channelsMap[channel.id] =
-                    Pair(channel.shows.firstOrNull()?.id ?: "", channel.shows.lastOrNull()?.id ?: "")
+                channelsMap[channel.id] = Pair(
+                    channel.shows.firstOrNull()?.id ?: "", channel.shows.lastOrNull()?.id ?: ""
+                )
             }
             DataModel.ChannelDataModel(
                 channelId = channel.id,
                 channelName = channel.name,
                 logo = channel.logo,
-                shows = channel.shows
+                shows = channel.shows,
+                onShowClick = { showId ->
+                    listener?.onShowClick(channelId = channel.id, showId = showId)
+                }
             )
         }
     }

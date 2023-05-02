@@ -73,14 +73,8 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             width = getCellWidth(start, end)
         }
 
-        binding.showParent.setOnFocusChangeListener { _, hasFocus ->
-            if (hasFocus) {
-                item.onShowSelect.invoke()
-            }
-        }
-
-        binding.showParent.setOnClickListenerDebounce {
-            item.onShowClick.invoke()
+        binding.root.setOnClickListenerDebounce {
+            item.onClick?.invoke()
         }
     }
 

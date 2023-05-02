@@ -11,6 +11,7 @@ import com.volkov.epg_recycler.databinding.ItemChannelLogoBinding
 import com.volkov.epgrecycler.adapters.models.DataModel
 import com.volkov.epgrecycler.context
 import com.volkov.epgrecycler.dpToPx
+import timber.log.Timber
 
 class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -30,7 +31,8 @@ class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             .apply(options)
             .into(binding.root)
 
-        binding.root.background = EPGConfig.channelLogoBackgroundDrawable?.let { context.getDrawable(it) }
+        binding.root.background =
+            EPGConfig.channelLogoBackgroundDrawable?.let { context.getDrawable(it) }
         val gap = EPGConfig.marginTop.dpToPx
 
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {

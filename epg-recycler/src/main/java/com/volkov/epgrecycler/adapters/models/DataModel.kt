@@ -18,18 +18,18 @@ sealed class DataModel(val id: String) {
         val channelName: String,
         val logo: String?,
         val shows: List<ShowModel>,
+        val onShowClick: ((String) -> Unit)? = null
     ) : DataModel("ChannelDataModel_$channelId")
 
     data class ShowDataModel(
-        val showIndex : Int,
+        val showIndex: Int,
         val channelId: String,
         val showId: String,
         val name: String,
         val showPreviewImage: String?,
         val startDate: DateTime,
         val endDate: DateTime,
-        val onShowSelect: () -> Unit,
-        val onShowClick: () -> Unit,
+        val onClick: (() -> Unit)? = null
     ) : DataModel("ShowDataModel_${showId}_${channelId}_${startDate}_${endDate}")
 
     data class EmptyShow(

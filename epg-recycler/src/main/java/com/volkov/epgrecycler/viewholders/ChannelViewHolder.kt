@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.volkov.EPGConfig
 import com.volkov.epg_recycler.databinding.ItemChannelBinding
-import com.volkov.epgrecycler.EPGRecyclerView
 import com.volkov.epgrecycler.EPGUtils
 import com.volkov.epgrecycler.EPGUtils.startTime
 import com.volkov.epgrecycler.RecyclerWithPositionView
@@ -28,9 +27,7 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(
         item: DataModel.ChannelDataModel,
-        horizontalScrollListener: RecyclerView.OnScrollListener,
-        focusListener: View.OnFocusChangeListener,
-        eventListener: EPGRecyclerView.OnEventListener? = null
+        horizontalScrollListener: RecyclerView.OnScrollListener
     ) {
         binding.root.tag = "channel_${item.channelId}"
 
@@ -47,7 +44,6 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             layoutManager = lm
             setHasFixedSize(false)
             this.scrollListener = horizontalScrollListener
-            this.onFocusChangeListener = focusListener
         }
         val showDataModelList: MutableList<DataModel> = item.shows.mapIndexed { index, show ->
             DataModel.ShowDataModel(
@@ -58,12 +54,9 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
                 showPreviewImage = show.showPreviewImage,
                 startDate = show.startDate,
                 endDate = show.endDate,
-                onShowSelect = {
-                    eventListener?.onShowSelected(item.channelId, show.id)
-                },
-                onShowClick = {
-                    eventListener?.onShowClick(item.channelId, show.id)
-                },
+                onClick = {
+                    item.onShowClick?.invoke(show.id)
+                }
             )
         }.toMutableList()
         item.shows.first().let { show ->

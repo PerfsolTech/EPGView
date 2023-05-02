@@ -40,7 +40,8 @@ dependencies {
     implementation("com.github.kirich1409:viewbindingpropertydelegate-noreflection:1.5.6")
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.activity:activity-ktx:1.6.1"
-    implementation "androidx.fragment:fragment-ktx:1.5.4"
+    implementation "androidx.fragment:fragment-ktx:1.5.5"
+    implementation "com.jakewharton.timber:timber:5.0.1"
 
     implementation "joda-time:joda-time:2.10.14"
     implementation "com.github.bumptech.glide:glide:4.13.2"

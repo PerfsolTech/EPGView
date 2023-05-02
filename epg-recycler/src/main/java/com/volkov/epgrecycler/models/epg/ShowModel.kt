@@ -9,6 +9,4 @@ data class ShowModel(
     val name: String,
     val startDate: DateTime,
     val endDate: DateTime,
-) {
-    val showTag = "$channelId#$id"
-}
+)
