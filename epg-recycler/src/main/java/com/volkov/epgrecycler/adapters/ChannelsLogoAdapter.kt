@@ -13,6 +13,9 @@ class ChannelsLogoAdapter : ListAdapter<DataModel, ChannelLogoViewHolder>(DiffCa
     }
 
     override fun onBindViewHolder(holder: ChannelLogoViewHolder, position: Int) {
-        holder.bind(getItem(position) as DataModel.ChannelDataModel)
+        val item = getItem(position)
+        if (item is DataModel.ChannelDataModel) {
+            holder.bind(item)
+        }
     }
 }

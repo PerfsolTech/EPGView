@@ -13,14 +13,11 @@ import com.volkov.epgrecycler.RecyclerWithPositionView
 import com.volkov.epgrecycler.adapters.ShowAdapter
 import com.volkov.epgrecycler.adapters.models.DataModel
 import com.volkov.epgrecycler.dpToPx
-import org.joda.time.DateTime
 
 class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     private val binding by viewBinding(ItemChannelBinding::bind)
     private val epgAdapter = ShowAdapter()
-    private lateinit var startDate: DateTime
-    private lateinit var endDate: DateTime
 
     private val horizontalRecyclerView: RecyclerWithPositionView
         get() = binding.root
@@ -36,8 +33,7 @@ class ChannelViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             topMargin = EPGConfig.marginTop.dpToPx
         }
 
-        startDate = item.shows.firstOrNull()?.startDate ?: return
-        endDate = DateTime(item.shows.last().endDate)
+        item.shows.firstOrNull()?.startDate ?: return
         horizontalRecyclerView.apply {
             val lm = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             adapter = epgAdapter

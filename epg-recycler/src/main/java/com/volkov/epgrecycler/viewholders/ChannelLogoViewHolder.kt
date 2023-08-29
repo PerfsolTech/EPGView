@@ -1,6 +1,7 @@
 package com.volkov.epgrecycler.viewholders
 
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -11,7 +12,6 @@ import com.volkov.epg_recycler.databinding.ItemChannelLogoBinding
 import com.volkov.epgrecycler.adapters.models.DataModel
 import com.volkov.epgrecycler.context
 import com.volkov.epgrecycler.dpToPx
-import timber.log.Timber
 
 class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -32,14 +32,15 @@ class ChannelLogoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
             .into(binding.root)
 
         binding.root.background =
-            EPGConfig.channelLogoBackgroundDrawable?.let { context.getDrawable(it) }
-        val gap = EPGConfig.marginTop.dpToPx
-
+            EPGConfig.channelLogoBackgroundDrawable?.let {
+                AppCompatResources.getDrawable(context, it)
+            }
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
-            height = EPGConfig.rowHeight.dpToPx
-            marginStart = gap
-            marginEnd = gap
-            topMargin = gap
+            height = EPGConfig.rowLogoHeight.dpToPx
+            marginStart = EPGConfig.marginHorizontalChannelLogo.dpToPx
+            marginEnd = EPGConfig.marginHorizontalChannelLogo.dpToPx
+            topMargin = EPGConfig.marginVerticalChannelLogo.dpToPx
+            bottomMargin = EPGConfig.marginVerticalChannelLogo.dpToPx
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.volkov.epgrecycler
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.Gravity
@@ -10,6 +11,7 @@ import android.view.View.OnFocusChangeListener
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.marginStart
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
@@ -33,11 +35,11 @@ import com.volkov.epgrecycler.adapters.ChannelsLogoAdapter
 import com.volkov.epgrecycler.adapters.TimeLineAdapter
 import com.volkov.epgrecycler.adapters.models.DataModel
 import com.volkov.epgrecycler.models.epg.ChannelModel
+import com.volkov.epgrecycler.models.epg.DummyModel
 import com.volkov.epgrecycler.models.epg.ShowModel
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 import org.joda.time.Minutes
-import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -48,9 +50,12 @@ class EPGRecyclerView @JvmOverloads constructor(
     private val binding by viewBinding(ViewEpgRecyclerBinding::bind)
 
     private var channels: List<ChannelModel> = emptyList()
-    private val channelsMap = mutableMapOf<String, Pair<String, String>>()
+    private var dummyItems: List<DummyModel> = emptyList()
+    private var currentDummyIndex = -1
 
     private var lastSelectedShowView: View? = null
+    private var lastSelectedShowViewTemp: View? = null
+    private var lastSelectedDummyView: View? = null
 
     interface OnEventListener {
         fun onShowSelected(channelId: String, showId: String)
@@ -132,15 +137,20 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
-    fun initView(channels: List<ChannelModel>, initChannel: String? = null) {
+    fun initView(
+        channels: List<ChannelModel>,
+        dummyItems: List<DummyModel> = emptyList(),
+        initChannel: String? = null
+    ) {
         initUI()
         setTimeHeader()
-        if (channels.isEmpty()) return
-        this.channels = channels
         initChannelRecycler()
+        this.channels = channels
+        this.dummyItems = dummyItems
         val mappedChannels = this.channels.mapChannels()
+        val mappedDummies = this.dummyItems.mapDummyItems()
         setChannelsLogo(mappedChannels)
-        setChannels(mappedChannels)
+        setChannels(mappedChannels + mappedDummies)
         scrollToNow()
         post {
             selectCurrentShow(initChannel ?: channels.firstOrNull()?.id)
@@ -148,11 +158,10 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
+    @SuppressLint("NewApi")
     private fun initUI() {
-        binding.verticalDelimiter.isVisible = EPGConfig.showDelimiter
-        binding.tvCurrentTime.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
-        binding.rvTimeLine.setBackgroundColor(context.getColor(EPGConfig.timeHeaderBackground))
-        binding.rvChannelsLogos.setBackgroundColor(context.getColor(EPGConfig.channelLogoBackground))
+        binding.rvTimeLine.setBackgroundColor(context.getColorRes(EPGConfig.timeHeaderBackground))
+        binding.rvChannelsLogos.setBackgroundColor(context.getColorRes(EPGConfig.channelLogoBackground))
     }
 
     private fun getNextShowByDirection(direction: MoveDirection): View? {
@@ -165,9 +174,8 @@ class EPGRecyclerView @JvmOverloads constructor(
             MoveDirection.UP -> {
                 val prevChannel = channels.getOrNull(currentChannelIndex - 1) ?: return null
                 val currentChannelShow =
-                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
-                val foundingTime =
-                    currentChannelShow.startDate.plusMinutes(currentChannelShow.showDuration / 2 + 1)
+                    currentChannel.shows.firstOrNull { it.id == showId } ?: return null
+                val foundingTime = currentChannelShow.startDate.plusSeconds(1)
                 val desiredShow = prevChannel.shows.singleOrNull {
                     it.startDate.isBefore(foundingTime) && it.endDate.isAfter(foundingTime)
                 } ?: prevChannel.shows.firstOrNull {
@@ -177,13 +185,13 @@ class EPGRecyclerView @JvmOverloads constructor(
                 } ?: return null
                 Pair(prevChannel, desiredShow)
             }
+
             MoveDirection.DOWN -> {
                 val nextChannel = channels.getOrNull(currentChannelIndex + 1) ?: return null
                 val currentChannelShow =
-                    currentChannel.shows.singleOrNull { it.id == showId } ?: return null
-                val foundingTime =
-                    currentChannelShow.startDate.plusMinutes(currentChannelShow.showDuration / 2 + 1)
-                val desiredShow = nextChannel.shows.singleOrNull {
+                    currentChannel.shows.firstOrNull { it.id == showId } ?: return null
+                val foundingTime = currentChannelShow.startDate.plusSeconds(1)
+                val desiredShow = nextChannel.shows.firstOrNull {
                     it.startDate.isBefore(foundingTime) && it.endDate.isAfter(foundingTime)
                 } ?: nextChannel.shows.firstOrNull {
                     it.startDate.isAfter(foundingTime)
@@ -192,6 +200,7 @@ class EPGRecyclerView @JvmOverloads constructor(
                 } ?: return null
                 Pair(nextChannel, desiredShow)
             }
+
             MoveDirection.LEFT -> {
                 val currentChannelShow =
                     currentChannel.shows.singleOrNull { it.id == showId } ?: return null
@@ -200,6 +209,7 @@ class EPGRecyclerView @JvmOverloads constructor(
                     currentChannel.shows.getOrNull(currentShowIndex - 1) ?: return null
                 Pair(currentChannel, desiredShow)
             }
+
             MoveDirection.RIGHT -> {
                 val currentChannelShow =
                     currentChannel.shows.singleOrNull { it.id == showId } ?: return null
@@ -208,40 +218,82 @@ class EPGRecyclerView @JvmOverloads constructor(
                     currentChannel.shows.getOrNull(currentShowIndex + 1) ?: return null
                 Pair(currentChannel, desiredShow)
             }
+
             MoveDirection.NONE -> return null
         }
         selectShow(channel, desiredShow)
         return lastSelectedShowView
     }
 
+    private fun selectDummyChannel(direction: MoveDirection): View? {
+        lastSelectedDummyView?.isSelected = false
+        if (direction == MoveDirection.DOWN) {
+            if (currentDummyIndex == dummyItems.lastIndex) currentDummyIndex = dummyItems.lastIndex
+            else currentDummyIndex++
+        } else if (direction == MoveDirection.UP) {
+            if (currentDummyIndex <= 0) currentDummyIndex = -1 else currentDummyIndex--
+        } else return null
+        val dummyItem = dummyItems.getOrNull(currentDummyIndex) ?: return null
+        val dummyIndex = dummyItems.indexOf(dummyItem)
+        val viewTag =
+            context.getString(R.string.dummy_channel_item, "${dummyIndex}_${dummyItem.title}")
+        val view = binding.rvChannels.findViewWithTag<View>(viewTag) ?: return null
+        view.isSelected = true
+        return view
+    }
+
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
         return when {
             event.onDownPressed() -> {
-                getNextShowByDirection(MoveDirection.DOWN)
-                true
-            }
-            event.onUpPressed() -> {
-                if (getNextShowByDirection(MoveDirection.UP) == null) {
+                if (getNextShowByDirection(MoveDirection.DOWN) == null) {
                     lastSelectedShowView?.isSelected = false
-                    listener?.onShowExit()
+                    lastSelectedShowView?.let { lastSelectedShowViewTemp = it }
+                    lastSelectedShowView = null
+                    lastSelectedDummyView = selectDummyChannel(MoveDirection.DOWN)
                 }
                 true
             }
+
+            event.onUpPressed() -> {
+                lastSelectedDummyView = selectDummyChannel(MoveDirection.UP)
+                if (lastSelectedDummyView == null) {
+                    lastSelectedShowViewTemp?.let {
+                        lastSelectedShowView = it
+                        lastSelectedShowView?.isSelected = true
+                        lastSelectedShowViewTemp = null
+                        return true
+                    }
+
+                    if (getNextShowByDirection(MoveDirection.UP) == null) {
+                        lastSelectedShowView?.isSelected = false
+                        listener?.onShowExit()
+                    }
+                }
+                true
+            }
+
             event.onLeftPressed() -> {
                 getNextShowByDirection(MoveDirection.LEFT)
                 true
             }
+
             event.onRightPressed() -> {
                 getNextShowByDirection(MoveDirection.RIGHT)
                 true
             }
+
             event.onEnterPressed() -> {
+                lastSelectedDummyView?.let {
+                    it.performClick()
+                    return true
+                }
                 lastSelectedShowView?.let {
                     val tag = lastSelectedShowView?.tag.toString().split("#")
                     listener?.onShowClick(tag[0], tag[1])
                 }
                 true
             }
+
             else -> super.dispatchKeyEvent(event)
         }
     }
@@ -264,12 +316,17 @@ class EPGRecyclerView @JvmOverloads constructor(
         val indicatorPosition = getCellWidthSeconds(startTime, now)
         val isVisible = indicatorPosition - timeLineScrollPosition in (0..binding.rvTimeLine.width)
         binding.timeIndicator.isVisible = isVisible && EPGConfig.showTimeLine
+        binding.tvTimeLineLabel.isVisible = binding.timeIndicator.isVisible
         binding.timeIndicator.updateLayoutParams<LayoutParams> {
             marginStart = getCellWidthSeconds(currentEpgTime, now)
         }
+        binding.tvTimeLineLabel.updateLayoutParams<LayoutParams> {
+            marginStart = binding.timeIndicator.marginStart - 25.dpToPx
+        }
+        binding.tvTimeLineLabel.text = DateTime().toString("HH:mm")
         if (!withSubmit) return
-        binding.rvChannels.children.toList().map { it as RecyclerView }.forEach {
-            it.children.toList().map { view -> view.tag?.toString() ?: "" }.forEach { tag ->
+        binding.rvChannels.children.toList().map { it as? RecyclerView }.forEach {
+            it?.children?.toList()?.map { view -> view.tag?.toString() ?: "" }?.forEach { tag ->
                 if (tag.isNotEmpty() && tag.contains("#")) {
                     val v = tag.split("#")
                     val channelId = v.firstOrNull()
@@ -314,6 +371,7 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
+    @Suppress("unused")
     fun selectShow(
         channelId: String, showId: String
     ) {
@@ -417,25 +475,26 @@ class EPGRecyclerView @JvmOverloads constructor(
         timeAdapter.submitList(hours.toList())
     }
 
-    private fun setChannelsLogo(channels: List<DataModel.ChannelDataModel>) {
-        channelsLogoAdapter.submitList(channels)
+    private fun setChannelsLogo(items: List<DataModel>) {
+        channelsLogoAdapter.submitList(items)
     }
 
-    private fun setChannels(channels: List<DataModel.ChannelDataModel>) {
-        (binding.rvChannels.adapter as? ChannelListAdapter)?.submitList(channels)
+    private fun setChannels(items: List<DataModel>) {
+        (binding.rvChannels.adapter as? ChannelListAdapter)?.submitList(items)
     }
 
     private fun scrollAll(recyclerView: RecyclerView?, dx: Int) {
-        val rvChildren = binding.rvChannels.children.map { it as RecyclerWithPositionView }.toList()
+        val rvChildren =
+            binding.rvChannels.children.map { it as? RecyclerWithPositionView }.toList()
         rvChildren.forEach {
-            if (recyclerView != it) it.scrollHorizontallyBy(dx)
+            if (recyclerView != it) it?.scrollHorizontallyBy(dx)
         }
     }
 
     private fun scrollTimeHeader(recyclerView: RecyclerView?, dx: Int) {
         timeLineScrollPosition = max(timeLineScrollPosition + dx, 0)
         currentEpgTime = startTime.plusMinutes(timeLineScrollPosition / minuteToPixel)
-        binding.tvCurrentTime.text = currentEpgTime.toString("EEE, dd MMM HH:mm")
+        updateTimeIndicator()
         if (binding.rvTimeLine != recyclerView) {
             binding.rvTimeLine.apply {
                 clearOnScrollListeners()
@@ -465,21 +524,22 @@ class EPGRecyclerView @JvmOverloads constructor(
         }
     }
 
-    private fun List<ChannelModel>.mapChannels(): List<DataModel.ChannelDataModel> {
+    private fun List<ChannelModel>.mapChannels(): List<DataModel> {
         return this.map { channel ->
-            if (channel.shows.isNotEmpty()) {
-                channelsMap[channel.id] = Pair(
-                    channel.shows.firstOrNull()?.id ?: "", channel.shows.lastOrNull()?.id ?: ""
-                )
-            }
-            DataModel.ChannelDataModel(
-                channelId = channel.id,
+            DataModel.ChannelDataModel(channelId = channel.id,
                 channelName = channel.name,
                 logo = channel.logo,
                 shows = channel.shows,
                 onShowClick = { showId ->
                     listener?.onShowClick(channelId = channel.id, showId = showId)
-                }
+                })
+        }
+    }
+
+    private fun List<DummyModel>.mapDummyItems(): List<DataModel> {
+        return this.mapIndexed { index, dummy ->
+            DataModel.DummyChannel(
+                title = dummy.title, dummyIndex = index, onClick = dummy.onClick
             )
         }
     }
@@ -487,7 +547,4 @@ class EPGRecyclerView @JvmOverloads constructor(
     private fun List<ShowModel>.getCurrentShow(): ShowModel? {
         return this.find { it.startDate.isBeforeNow && it.endDate.isAfterNow }
     }
-
-    private val ShowModel.showDuration: Int
-        get() = Minutes.minutesBetween(startDate, endDate).minutes
 }

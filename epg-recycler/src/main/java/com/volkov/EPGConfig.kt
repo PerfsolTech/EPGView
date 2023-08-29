@@ -16,17 +16,21 @@ object EPGConfig {
     @DrawableRes
     var channelLogoBackgroundDrawable: Int? = null
 
+    @DrawableRes
+    var channelDummyBackgroundDrawable: Int? = null
+
     @ColorRes
     var timeHeaderColor = android.R.color.white
-
-    var showDelimiter = true
 
     /** channel row */
     // height in DP
     var rowHeight = 40
+    var rowLogoHeight = 40
 
     // margin in dp
     var marginTop = 0
+    var marginVerticalChannelLogo = 0
+    var marginHorizontalChannelLogo = 0
     var marginEnd = 0
 
     @DrawableRes
@@ -37,5 +41,5 @@ object EPGConfig {
     var isProgressVisible = false
     var showTimeLine = true
 
-    var focusDelay : Long = 0L
+    var focusDelay: Long = 0L
 }

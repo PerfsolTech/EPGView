@@ -1,4 +1,5 @@
 <resources>
     <string name="midnight_time">00:00</string>
     <string name="view_coroutine_scope">view_coroutine_scope</string>
+    <string name="dummy_channel_item">dummy_channel_item_%s</string>
 </resources>

@@ -9,4 +9,5 @@
     android:focusable="false"
     android:focusableInTouchMode="false"
     android:scaleType="centerInside"
-    tools:ignore="ContentDescription" />
+    tools:ignore="ContentDescription"
+    tools:src="@drawable/ic_android" />

@@ -37,4 +37,10 @@ sealed class DataModel(val id: String) {
         val isStart: Boolean,
         val width: Int
     ) : DataModel("EmptyShow_${channelId}_${isStart}_$width")
+
+    data class DummyChannel(
+        val title: String,
+        val dummyIndex: Int,
+        val onClick: (() -> Unit)? = null,
+    ) : DataModel("DummyChannel_$title")
 }
