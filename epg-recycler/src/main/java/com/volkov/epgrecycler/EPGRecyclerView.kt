@@ -246,10 +246,12 @@ class EPGRecyclerView @JvmOverloads constructor(
         return when {
             event.onDownPressed() -> {
                 if (getNextShowByDirection(MoveDirection.DOWN) == null) {
-                    lastSelectedShowView?.isSelected = false
-                    lastSelectedShowView?.let { lastSelectedShowViewTemp = it }
-                    lastSelectedShowView = null
                     lastSelectedDummyView = selectDummyChannel(MoveDirection.DOWN)
+                    if (lastSelectedDummyView != null) {
+                        lastSelectedShowView?.isSelected = false
+                        lastSelectedShowView?.let { lastSelectedShowViewTemp = it }
+                        lastSelectedShowView = null
+                    }
                 }
                 true
             }

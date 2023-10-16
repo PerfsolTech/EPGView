@@ -28,9 +28,15 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     @SuppressLint("SetTextI18n")
     fun bind(item: DataModel.ShowDataModel) {
-        binding.showParent.tag = "${item.channelId}#${item.showId}"
-        binding.root.background =
+        binding.background.tag = "${item.channelId}#${item.showId}"
+        binding.background.background =
             ContextCompat.getDrawable(context, EPGConfig.showBackgroundDrawable)
+
+        EPGConfig.showBackgroundColorStateList?.let {
+            binding.background.backgroundTintList = it
+        }
+
+        binding.background.isActivated = item.isLiveShow
 
         binding.root.updateLayoutParams<RecyclerView.LayoutParams> {
             marginEnd = EPGConfig.marginEnd.dpToPx
@@ -62,8 +68,6 @@ class ShowViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val realEndDate = DateTime(item.endDate)
         val start = if (item.startDate.isBefore(startTime)) startTime else item.startDate
         val end = if (item.endDate.isAfter(endTime)) endTime else item.endDate
-
-        binding.showParent.isActivated = item.isLiveShow
 
         binding.tvTitle.text = item.name
         binding.tvSubTitle.text =

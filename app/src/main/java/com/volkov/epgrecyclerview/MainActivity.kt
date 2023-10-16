@@ -1,12 +1,15 @@
 package com.volkov.epgrecyclerview
 
+import android.content.res.ColorStateList
+import android.graphics.Color
+import android.graphics.drawable.ColorStateListDrawable
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.volkov.EPGConfig
 import com.volkov.epgrecycler.EPGRecyclerView
+import com.volkov.epgrecycler.getColorRes
 import com.volkov.epgrecycler.models.epg.ChannelModel
-import com.volkov.epgrecycler.models.epg.DummyModel
 import com.volkov.epgrecycler.models.epg.ShowModel
 import com.volkov.epgrecyclerview.databinding.ActivityMainBinding
 import org.joda.time.DateTime
@@ -37,6 +40,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
             marginVerticalChannelLogo = 5
         }
         EPGConfig.channelLogoBackgroundDrawable = com.volkov.epg_recycler.R.drawable.bg_radius_4dp
+        EPGConfig.showBackgroundDrawable = com.volkov.epg_recycler.R.drawable.show_background
         binding.epgView.apply {
             setDayShift(0)
             val startDate = DateTime().minusMinutes(10)
@@ -94,9 +98,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
                     )
                 ),
                 dummyItems = listOf(
-                    DummyModel("Test") { Timber.e("Test") },
-                    DummyModel("Test2") { Timber.e("Test2") },
-                    DummyModel("Test3") { Timber.e("Test3") }),
+//                    DummyModel("Test") { Timber.e("Test") },
+//                    DummyModel("Test2") { Timber.e("Test2") },
+//                    DummyModel("Test3") { Timber.e("Test3") }
+                ),
             )
         }
     }

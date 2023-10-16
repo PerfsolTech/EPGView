@@ -1,5 +1,9 @@
 package com.volkov
 
+import android.content.res.ColorStateList
+import android.graphics.drawable.ColorStateListDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.StateListDrawable
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
@@ -35,6 +39,7 @@ object EPGConfig {
 
     @DrawableRes
     var showBackgroundDrawable = R.drawable.show_background
+    var showBackgroundColorStateList: ColorStateList? = null
     var displayPreviewForLiveShow = false
     var transform: List<BitmapTransformation>? = null
     var logoTransform: List<BitmapTransformation>? = null

@@ -5,11 +5,18 @@
     android:id="@+id/show_parent"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/show_background"
+    android:background="@drawable/bg_stroke_1dp"
     android:focusable="false"
     android:focusableInTouchMode="false"
     android:gravity="center_vertical"
     android:orientation="horizontal">
+
+    <View
+        android:id="@+id/background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/show_background"
+        android:layout_margin="1dp" />
 
     <ImageView
         android:id="@+id/iv_show_image"
