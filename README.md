@@ -1,12 +1,12 @@
-# EPGGrid Android Library - TV Schedule Display Library
+# EPG View Android Library - TV Schedule Display Library
 
-![EPGGrid](https://github.com/PerfsolTech/EPGView/blob/main/epg_image.png?raw=true)
+![EPG View](https://github.com/PerfsolTech/EPGView/blob/main/epg_image.png?raw=true)
 
-EPGGrid Android Library is a powerful tool for creating TV schedule (EPG) viewing interfaces on Android TV and mobile devices. It provides a simple and flexible way to display and manage TV channel schedules, allowing users to easily browse available programs and set reminders.
+EPG View Android Library is a powerful tool for creating TV schedule (EPG) viewing interfaces on Android TV and mobile devices based on RecyclerView and makes it easy to efficiently display large sets of data. It provides a simple and flexible way to display and manage TV channel schedules, allowing users to browse available programs and set reminders easily.
 
 ## Features
 
-- Display TV schedule as a grid.
+- Display the TV schedule as a grid.
 - Support for various EPG data sources (Mapping XML, JSON, API to library model).
 - Customizable design and styling.
 - Program search and filtering capabilities.
