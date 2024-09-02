@@ -2,7 +2,7 @@
 
 ![EPG View](https://github.com/PerfsolTech/EPGView/blob/main/epg_image.png?raw=true)
 
-EPG View Android Library is a powerful tool for creating TV schedule (EPG) viewing interfaces on Android TV and mobile devices based on RecyclerView and makes it easy to efficiently display large sets of data. It provides a simple and flexible way to display and manage TV channel schedules, allowing users to browse available programs and set reminders easily.
+EPG View Android Library is a powerful tool for creating TV schedule (EPG) viewing interfaces on Android TV and mobile devices based on RecyclerView. It makes it easy to display large sets of data efficiently. It provides a simple and flexible way to display and manage TV channel schedules, allowing users to browse available programs and set reminders easily.
 
 ## Features
 
